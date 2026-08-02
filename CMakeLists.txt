@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
         src/input/Input.cpp
         src/game/Game.cpp
         src/game/Game.h
+        src/game/render/Shader.cpp
+        src/game/render/Shader.h
 )
 
 # Include Directories for Headers
