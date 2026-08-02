@@ -18,6 +18,8 @@ add_subdirectory(thirdparty/glfw)
 add_executable(${PROJECT_NAME}
         src/main.cpp
         thirdparty/glad/src/glad.c
+        src/core/window.cpp
+        src/core/window.h
 )
 
 # Include Directories for Headers
