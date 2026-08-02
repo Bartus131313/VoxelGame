@@ -32,6 +32,15 @@ add_executable(${PROJECT_NAME}
         src/game/Game.h
         src/game/render/Shader.cpp
         src/game/render/Shader.h
+        src/game/render/font/FontRenderer.cpp
+        src/game/render/font/FontRenderer.h
+        src/game/render/Vertex.h
+        src/game/ui/UIElement.h
+        src/game/ui/elements/UILabel.h
+        src/game/ui/Canvas.h
+        src/game/render/font/FontManager.cpp
+        src/game/render/font/FontManager.h
+        src/game/ui/Canvas.cpp
 )
 
 # Include Directories for Headers

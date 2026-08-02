@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../core/Window.h"
+#include "render/font/FontRenderer.h"
+#include "ui/Canvas.h"
+#include "ui/elements/UILabel.h"
 
 /// Main application controller that manages the window lifecycle, input system, and primary game loop.
 class Game {
@@ -28,22 +31,26 @@ public:
     int run();
 private:
     /// Registers logical action mappings and binds them to default keyboard, mouse, and gamepad inputs.
-    void setupInputBindings();
+    static void setupInputBindings();
 
     /// Called on update pass. Updates the whole game with given delta time.
     /// @param deltaTime Time passed between previous and current frame.
     void update(float deltaTime);
 
     /// Called on render pass. Renders the whole game.
-    void render() const;
+    void render();
 
     /// Performs cleanup operations when the game loop terminates.
     void cleanup();
+
+    Window m_window;    ///< Core window wrapper managing the GLFW context and render surface.
+
+    Canvas m_canvas;
+    UILabel* m_fpsLabel = nullptr;
 
     double m_lastUpdateTime{};    ///< Last time when game was updated.
     double m_lastRenderTime{};    ///< Last time when game was rendered.
     int m_renderedFrames{};       ///< Count of frames that were rendered since last FPS update.
 
     int m_fps;          ///< Frames per second calculated every second on update pass.
-    Window m_window;    ///< Core window wrapper managing the GLFW context and render surface.
 };

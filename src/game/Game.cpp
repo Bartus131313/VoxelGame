@@ -1,12 +1,12 @@
 #include "Game.h"
-#include "../input/Input.h"
 
 #include <iostream>
 #include <glm/glm.hpp>
+#include "../input/Input.h"
+#include "glm/ext/matrix_clip_space.hpp"
 
 Game::Game()
-    : m_fps(0), m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
-{
+    : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT), m_fps(0) {
 }
 
 void Game::update(float deltaTime) {
@@ -30,11 +30,17 @@ void Game::update(float deltaTime) {
     if (const glm::vec2 scrollDelta = Input::getMouse().getScrollDelta(); scrollDelta.y != 0.0f) {
         std::cout << "[Game] Mouse Scroll Y: " << scrollDelta.y << "\n";
     }
+
+    // Set the canvas size to current one
+    m_canvas.setSize(m_window.getWidth(), m_window.getHeight());
 }
 
-void Game::render() const {
+void Game::render() {
     // Clear background using Sky Blue color
     m_window.clear(0.6f, 0.8f, 1.0f, 1.0f);
+
+    if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
+    m_canvas.render();
 }
 
 int Game::run() {
@@ -54,6 +60,11 @@ int Game::run() {
 
     std::cout << "[Game] Initialized successfully!\n";
 
+    // Add elements to canvas
+    m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0").get();
+    m_fpsLabel->setPosition(20, 20);
+    m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
+
     // Main game loop
     while (!m_window.shouldClose()) {
         // Update pass
@@ -67,8 +78,6 @@ int Game::run() {
             m_lastRenderTime = currentTime;
             m_fps = m_renderedFrames;
             m_renderedFrames = 0;
-
-            std::cout << "[Game] FPS: " << m_fps << "\n";
         }
         render();
 
