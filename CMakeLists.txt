@@ -20,6 +20,14 @@ add_executable(${PROJECT_NAME}
         thirdparty/glad/src/glad.c
         src/core/window.cpp
         src/core/window.h
+        src/core/input/keyboardManager.cpp
+        src/core/input/KeyboardManager.h
+        src/core/input/mouseManager.cpp
+        src/core/input/MouseManager.h
+        src/core/input/gamepadManager.cpp
+        src/core/input/gamepadManager.h
+        src/core/input/Input.h
+        src/core/input/Input.cpp
 )
 
 # Include Directories for Headers
