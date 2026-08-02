@@ -58,15 +58,15 @@ private:
     static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
     static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 
-    GLFWwindow* m_window = nullptr; ///< Active GLFW window handle.
+    GLFWwindow* m_window = nullptr;             ///< Active GLFW window handle.
 
-    glm::vec2 m_position{0.0f, 0.0f};    ///< Current absolute position of cursor.
-    glm::vec2 m_delta{0.0f, 0.0f};       ///< Movement offset since last frame.
-    glm::vec2 m_scrollDelta{0.0f, 0.0f}; ///< Accumulation of scroll input for current frame.
+    glm::vec2 m_position{0.0f, 0.0f};       ///< Current absolute position of cursor.
+    glm::vec2 m_delta{0.0f, 0.0f};          ///< Movement offset since last frame.
+    glm::vec2 m_scrollDelta{0.0f, 0.0f};    ///< Accumulation of scroll input for current frame.
 
-    bool m_firstMouse = true;    ///< Flag to prevent sudden camera jump on initial focus.
-    bool m_cursorLocked = false; ///< Tracks current cursor lock state.
+    bool m_firstMouse = true;                   ///< Flag to prevent sudden camera jump on initial focus.
+    bool m_cursorLocked = false;                ///< Tracks current cursor lock state.
 
-    std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> m_currentButtons{};  ///< Button states in current frame.
-    std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> m_previousButtons{}; ///< Button states in previous frame.
+    std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> m_currentButtons{};    ///< Button states in current frame.
+    std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> m_previousButtons{};   ///< Button states in previous frame.
 };
