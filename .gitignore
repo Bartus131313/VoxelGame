@@ -1,1 +1,20 @@
-/cmake-build-debug/
+# CMake Build Directories
+build/
+cmake-build-debug/
+cmake-build-release/
+out/
+
+# IDE / Editor Folders
+.vs/
+.vscode/
+.idea/
+*.user
+
+# Binary / Executable Outputs
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.obj
+*.o
