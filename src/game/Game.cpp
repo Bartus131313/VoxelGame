@@ -7,10 +7,10 @@
 #include "glm/ext/matrix_transform.hpp"
 
 Game::Game()
-    : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT), m_fps(0) {
+    : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT) {
 }
 
-void Game::update(float deltaTime) {
+void Game::update(const float deltaTime) {
     // Update Input System
     Input::update();
 
@@ -32,6 +32,10 @@ void Game::update(float deltaTime) {
         std::cout << "[Game] Mouse Scroll Y: " << scrollDelta.y << "\n";
     }
 
+    // Update player
+    m_player.getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
+    m_player.update(deltaTime);
+
     // Set the canvas size to current one
     m_canvas.setSize(m_window.getWidth(), m_window.getHeight());
 }
@@ -46,8 +50,8 @@ void Game::render() {
     if (m_testShader) {
         m_testShader->use();
         m_testShader->setMat4("model", modelMatrix);
-        m_testShader->setMat4("view", m_camera.getViewMatrix());
-        m_testShader->setMat4("projection", m_camera.getProjectionMatrix());
+        m_testShader->setMat4("view", m_player.getCamera().getViewMatrix());
+        m_testShader->setMat4("projection", m_player.getCamera().getProjectionMatrix());
 
         glBindVertexArray(m_testVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);

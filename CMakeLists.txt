@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/shader/ShaderManager.h
         src/game/render/camera/Camera3D.cpp
         src/game/render/camera/Camera3D.h
+        src/game/entity/Player.cpp
+        src/game/entity/Player.h
 )
 
 # Include Directories for Headers

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/Window.h"
+#include "entity/Player.h"
 #include "render/camera/Camera3D.h"
 #include "render/font/FontRenderer.h"
 #include "ui/Canvas.h"
@@ -49,13 +50,13 @@ private:
     Canvas m_canvas;
     UILabel* m_fpsLabel = nullptr;
 
-    Camera3D m_camera{};
+    Player m_player{};
     Shader* m_testShader = nullptr;
-    GLuint m_testVAO, m_testVBO;
+    GLuint m_testVAO{}, m_testVBO{};
 
     double m_lastUpdateTime{};    ///< Last time when game was updated.
     double m_lastRenderTime{};    ///< Last time when game was rendered.
     int m_renderedFrames{};       ///< Count of frames that were rendered since last FPS update.
 
-    int m_fps;          ///< Frames per second calculated every second on update pass.
+    int m_fps{};          ///< Frames per second calculated every second on update pass.
 };
