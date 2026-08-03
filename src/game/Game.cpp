@@ -2,8 +2,9 @@
 
 #include <iostream>
 #include <glm/glm.hpp>
+
 #include "../input/Input.h"
-#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 Game::Game()
     : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT), m_fps(0) {
@@ -35,9 +36,22 @@ void Game::update(float deltaTime) {
     m_canvas.setSize(m_window.getWidth(), m_window.getHeight());
 }
 
+auto modelMatrix = glm::mat4(1.0f);
+
 void Game::render() {
     // Clear background using Sky Blue color
     m_window.clear(0.6f, 0.8f, 1.0f, 1.0f);
+
+    // Render test triangle
+    if (m_testShader) {
+        m_testShader->use();
+        m_testShader->setMat4("model", modelMatrix);
+        m_testShader->setMat4("view", m_camera.getViewMatrix());
+        m_testShader->setMat4("projection", m_camera.getProjectionMatrix());
+
+        glBindVertexArray(m_testVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
 
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
     m_canvas.render();
@@ -64,6 +78,26 @@ int Game::run() {
     m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0").get();
     m_fpsLabel->setPosition(20, 20);
     m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
+
+    // Setup test triangle rendering
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
+    m_testShader = ShaderManager::loadShader("test").get();
+
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         0.0f,  0.5f, 0.0f
+    };
+
+    glGenVertexArrays(1, &m_testVAO);
+    glGenBuffers(1, &m_testVBO);
+
+    glBindVertexArray(m_testVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
+    glEnableVertexAttribArray(0);
 
     // Main game loop
     while (!m_window.shouldClose()) {

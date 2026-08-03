@@ -43,6 +43,8 @@ add_executable(${PROJECT_NAME}
         src/game/ui/Canvas.cpp
         src/game/render/shader/ShaderManager.cpp
         src/game/render/shader/ShaderManager.h
+        src/game/render/camera/Camera3D.cpp
+        src/game/render/camera/Camera3D.h
 )
 
 # Include Directories for Headers
