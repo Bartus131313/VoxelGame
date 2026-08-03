@@ -6,26 +6,26 @@ project(VoxelGame CXX C)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Build GLFW from thirdparty/glfw
+# Build GLFW from third_party/glfw
 # Disable building GLFW docs, tests, and examples to keep build fast
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(thirdparty/glfw)
+add_subdirectory(third_party/glfw)
 
 # Define Executable & Source Files
 add_executable(${PROJECT_NAME}
+        third_party/glad/src/glad.c
         src/main.cpp
-        thirdparty/glad/src/glad.c
-        src/core/window.cpp
-        src/core/window.h
-        src/input/keyboardManager.cpp
+        src/core/Window.cpp
+        src/core/Window.h
+        src/input/KeyboardManager.cpp
         src/input/KeyboardManager.h
-        src/input/mouseManager.cpp
+        src/input/MouseManager.cpp
         src/input/MouseManager.h
-        src/input/gamepadManager.cpp
-        src/input/gamepadManager.h
+        src/input/GamepadManager.cpp
+        src/input/GamepadManager.h
         src/input/Input.h
         src/input/Input.cpp
         src/game/Game.cpp
@@ -45,9 +45,9 @@ add_executable(${PROJECT_NAME}
 
 # Include Directories for Headers
 target_include_directories(${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glad/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glm
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/stb
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glm
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb
 )
 
 # Link Libraries
