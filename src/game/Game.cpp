@@ -40,8 +40,6 @@ void Game::update(const float deltaTime) {
     m_canvas.setSize(m_window.getWidth(), m_window.getHeight());
 }
 
-auto modelMatrix = glm::mat4(1.0f);
-
 void Game::render() {
     // Clear background using Sky Blue color
     m_window.clear(0.6f, 0.8f, 1.0f, 1.0f);
@@ -49,7 +47,7 @@ void Game::render() {
     // Render test triangle
     if (m_testShader) {
         m_testShader->use();
-        m_testShader->setMat4("model", modelMatrix);
+        m_testShader->setMat4("model", m_testModelMatrix);
         m_testShader->setMat4("view", m_player.getCamera().getViewMatrix());
         m_testShader->setMat4("projection", m_player.getCamera().getProjectionMatrix());
 
@@ -79,13 +77,13 @@ int Game::run() {
     std::cout << "[Game] Initialized successfully!\n";
 
     // Add elements to canvas
-    m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0").get();
+    m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0");
     m_fpsLabel->setPosition(20, 20);
     m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
 
     // Setup test triangle rendering
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
-    m_testShader = ShaderManager::loadShader("test").get();
+    m_testModelMatrix = glm::translate(m_testModelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
+    m_testShader = ShaderManager::loadShader("test");
 
     constexpr float vertices[] = {
         -0.5f, -0.5f, 0.0f,

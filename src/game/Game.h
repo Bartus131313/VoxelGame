@@ -62,12 +62,13 @@ private:
 
     Window m_window;    ///< Core window wrapper managing the GLFW context and render surface.
 
-    Canvas m_canvas;                ///< UI canvas used to render some debug info. <b>Won't be here.</b>
-    UILabel* m_fpsLabel = nullptr;  ///< Label that displays FPS. <b>Won't be here.</b>
+    Canvas m_canvas;                                    ///< Debug UI canvas used to render some debug info.
+    std::shared_ptr<UILabel> m_fpsLabel = nullptr;      ///< Debug label that displays FPS.
 
-    Player m_player{};                  ///< Local player functioning as a drone camera. <b>Won't be here.</b>
-    Shader* m_testShader = nullptr;     ///< Test shader used to paint triangle red. <b>Won't be here.</b>
-    GLuint m_testVAO{}, m_testVBO{};    ///< Test VAO and VBO used to draw the triangle. <b>Won't be here.</b>
+    Player m_player{};                                  ///< Test local player functioning as a drone camera.
+    std::shared_ptr<Shader> m_testShader = nullptr;     ///< Test shader used to paint triangle red.
+    GLuint m_testVAO{}, m_testVBO{};                    ///< Test VAO and VBO used to draw the triangle.
+    glm::mat4 m_testModelMatrix = glm::mat4(1.0f);    ///< Test model matrix for the triangle.
 
     double m_lastUpdateTime{};    ///< Last time when game was updated.
     double m_lastRenderTime{};    ///< Last time when game was rendered.
