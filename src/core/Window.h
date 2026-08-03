@@ -36,21 +36,21 @@ public:
     }
 
     /**
-     * @biref Checks whether the user or OS requested the window to close.
+     * @brief Checks whether the user or OS requested the window to close.
      *
      * @return @c true if window should close, @c false otherwise.
      */
     [[nodiscard]] bool shouldClose() const;
 
     /**
-     * @biref Swaps front and back rendering buffers and processes OS window events.
+     * @brief Swaps front and back rendering buffers and processes OS window events.
      *
      * @note Call once per frame at the end of the frame cycle.
      */
     void update() const;
 
     /**
-     * @biref Clears the framebuffer's color and depth buffers with a specified RGBA color.
+     * @brief Clears the framebuffer's color and depth buffers with a specified RGBA color.
      *
      * @param r Red component (0.0 to 1.0).
      * @param g Green component (0.0 to 1.0).
@@ -84,9 +84,9 @@ public:
     void close() const;
 
 private:
-    /** @biref Initialized the window with raw GLFW calls. */
+    /** @brief Initialized the window with raw GLFW calls. */
     void init();
-    /** @biref Centers the window. */
+    /** @brief Centers the window. */
     void centerWindow() const;
 
     /**
