@@ -8,7 +8,7 @@
 #include "glad/glad.h"
 #include "stb_truetype.h"
 
-/// Represents data of a loaded font, featuring automated VRAM cleanup via RAII.
+/** @brief Represents data of a loaded font, featuring automated VRAM cleanup via RAII. */
 struct FontData {
     GLuint textureID = 0;                   ///< ID of OpenGL texture with all font chars.
     GLuint vao = 0;                         ///< Vertex array object ID.
@@ -16,7 +16,7 @@ struct FontData {
     float pixelAscent = 0.0f;               ///< Pixel ascent used for top-left anchoring.
     std::vector<stbtt_packedchar> charData; ///< Packed character metrics.
 
-    /// Automatically frees GPU textures, buffers, and vertex arrays when destroyed.
+    /** @brief  Automatically frees GPU textures, buffers, and vertex arrays when destroyed. */
     ~FontData() {
         if (textureID) glDeleteTextures(1, &textureID);
         if (vbo) glDeleteBuffers(1, &vbo);
@@ -27,7 +27,7 @@ struct FontData {
     FontData(const FontData&) = delete;
     FontData& operator=(const FontData&) = delete;
 
-    /// Default constructor initializing empty font metadata.
+    /** @brief  Default constructor initializing empty font metadata. */
     FontData() = default;
 
     // Enable moving for efficient storage inside standard containers
@@ -35,23 +35,27 @@ struct FontData {
     FontData& operator=(FontData&&) noexcept = default;
 };
 
-/// Handles font loading, unloading and caching.
+/** @brief Handles font loading, unloading and caching. */
 class FontManager {
 public:
     static constexpr auto FONTS_PATH        = "assets/fonts/"; ///< Default base directory for font assets.
     static constexpr int  FONT_ATLAS_WIDTH  = 512; ///< Width of the generated font texture atlas in pixels.
     static constexpr int  FONT_ATLAS_HEIGHT = 512; ///< Height of the generated font texture atlas in pixels.
 
-    /// Loads a new font into memory or returns the cached version if it already exists.
-    /// @param fontFileName File name of the font relative to @c FONTS_PATH folder.
-    /// @param fontSize Size of the font in pixels.
-    /// @return Shared pointer to FontData, or nullptr if loading failed.
+    /**
+     * @brief Loads a new font into memory or returns the cached version if it already exists.
+     *
+     * @param fontFileName File name of the font relative to @c FONTS_PATH folder.
+     * @param fontSize Size of the font in pixels.
+     * 
+     * @return Shared pointer to FontData, or nullptr if loading failed.
+     */
     static std::shared_ptr<FontData> loadFont(const std::string& fontFileName, int fontSize);
 
-    /// Clears the font cache, automatically invoking RAII cleanup on all loaded font resources.
+    /** @brief Clears the font cache, automatically invoking RAII cleanup on all loaded font resources. */
     static void cleanup();
 
 private:
-    /// Internal cache storing unique pointers to loaded font data mapped by a unique identifier key.
+    /** @brief Internal cache storing unique pointers to loaded font data mapped by a unique identifier key. */
     static std::unordered_map<std::string, std::shared_ptr<FontData>> m_fonts;
 };

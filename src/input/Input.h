@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
-/// Directional directions for analog stick axes and triggers.
+/** @brief Directional directions for analog stick axes and triggers. */
 enum class GamepadAxisDir {
     LeftStickLeft,   ///< Left stick pushed LEFT  (X < -threshold)
     LeftStickRight,  ///< Left stick pushed RIGHT (X > +threshold)
@@ -25,43 +25,59 @@ enum class GamepadAxisDir {
     RightTrigger     ///< Right trigger pulled past threshold
 };
 
-/// Types of hardware inputs that can trigger an action.
+/** @brief Types of hardware inputs that can trigger an action. */
 enum class InputType {
     KeyboardKey,
     MouseButton,
     GamepadButton,
-    GamepadAxis
+    GamepadAxis,
+    None
 };
 
-/// Holds input type and code that needs to be activated for action.
+/** @brief Holds input type and code that needs to be activated for action. */
 struct ActionBinding {
-    InputType type;
-    int code = 0;                          ///< Key code or button constant.
-    GamepadAxisDir axisDir{};              ///< Direction for GamepadAxis types.
-    float threshold = 0.5f;                ///< Deflection threshold (0.0f to 1.0f).
+    InputType type{InputType::None};        ///< Input type that this binding has.
+    int code = 0;                           ///< Key code or button constant.
+    GamepadAxisDir axisDir{};               ///< Direction for GamepadAxis types.
+    float threshold = 0.5f;                 ///< Deflection threshold (0.0f to 1.0f).
 };
 
-/// Handles all input related logic for Keyboard, Mouse and Gamepads.
+/** Handles all input related logic for Keyboard, Mouse and Gamepads. */
 class Input {
 public:
-    /// Initializes all device managers and registers GLFW callbacks.
-    /// @param window Pointer to the active GLFW window context.
+    /**
+     * @brief Initializes all device managers and registers GLFW callbacks.
+     *
+     * @param window Pointer to the active GLFW window context.
+     */
     static void init(GLFWwindow* window);
 
-    /// Polls device states and updates input history for all managers.
-    /// @note Must be called once per frame at the beginning of the update pass.
+    /**
+     * @brief Polls device states and updates input history for all managers.
+     *
+     * @note Must be called once per frame at the beginning of the update pass.
+     */
     static void update();
 
-    /// Gets the Keyboard Manager instance.
-    /// @return Reference to the active KeyboardManager.
+    /**
+     * @brief Gets the Keyboard Manager instance.
+     *
+     * @return Reference to the active KeyboardManager.
+     */
     static KeyboardManager& getKeyboard() { return s_keyboard; }
 
-    /// Gets the Mouse Manager instance.
-    /// @return Reference to the active MouseManager.
+    /**
+     * @brief Gets the Mouse Manager instance.
+     *
+     * @return Reference to the active MouseManager.
+     */
     static MouseManager& getMouse() { return s_mouse; }
 
-    /// Gets the Gamepad Manager instance.
-    /// @return Reference to the active GamepadManager.
+    /**
+     * @brief Gets the Gamepad Manager instance.
+     *
+     * @return Reference to the active GamepadManager.
+     */
     static GamepadManager& getGamepad() { return s_gamepad; }
 
     /**
@@ -71,6 +87,7 @@ public:
      * or gamepad buttons) under a single abstract name (e.g., "jump", "interact").
      *
      * @param actionName The unique identifier for the action.
+     *
      * @note If the action already exists, calling this will reset its bindings.
      */
     static void createAction(const std::string& actionName);
@@ -115,6 +132,7 @@ public:
      *
      * @param actionName The name of the action to query.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     *
      * @return @c true if any bound input is down, @c false otherwise.
      */
     static bool isActionPressed(const std::string& actionName, int playerIndex = 0);
@@ -126,6 +144,7 @@ public:
      *
      * @param actionName The name of the action to query.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     *
      * @return @c true only on the initial frame of activation, @c false on subsequent held frames.
      */
     static bool isActionJustPressed(const std::string& actionName, int playerIndex = 0);
@@ -137,6 +156,7 @@ public:
      *
      * @param actionName The name of the action to query.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     *
      * @return @c true only on the frame the physical input was released, @c false otherwise.
      */
     static bool isActionJustReleased(const std::string& actionName, int playerIndex = 0);
@@ -152,6 +172,7 @@ public:
      *
      * @param actionName The name of the action to query.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     *
      * @return A value from 0.0f (inactive) to 1.0f (fully active/deflected).
      */
     static float getActionStrength(const std::string& actionName, int playerIndex = 0);
@@ -160,10 +181,10 @@ public:
      * @brief Calculates a normalized 2D movement vector from four directional actions.
      *
      * Combines opposing axis inputs (e.g., WASD or D-Pad) into a single directional vector.
-     * Gamepad stick bindings contribute their analog deflection (via getActionStrength()),
+     * Gamepad stick bindings contribute their analog deflection (via @c getActionStrength()),
      * so partial stick pushes yield a proportionally shorter vector, while keyboard/button
-     * bindings contribute a full 1.0f. The resulting vector's length is clamped to 1.0f
-     * (so diagonals don't exceed full speed) but is NOT force-normalized, preserving analog
+     * bindings contribute a full @c 1.0f value. The resulting vector's length is clamped to @c 1.0f
+     * (so diagonals don't exceed full speed) but is <b>NOT</b> force-normalized, preserving analog
      * partial magnitudes.
      *
      * @param left Action name for -X direction.
@@ -171,28 +192,31 @@ public:
      * @param up Action name for +Y direction.
      * @param down Action name for -Y direction.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     *
      * @return A @c glm::vec2 direction vector with magnitude in [0.0f, 1.0f].
      */
     static glm::vec2 getVector(const std::string& left, const std::string& right,
                                const std::string& up, const std::string& down, int playerIndex = 0);
 
-    /// Helper to get the total number of connected gamepads.
-    /// @return Total number of connected gamepads.
+    /**
+     * @brief Helper to get the total number of connected gamepads.
+     *
+     * @return Total number of connected gamepads.
+     */
     static int getConnectedGamepadCount();
 
 private:
     static bool isAxisDirectionActive(GamepadAxisDir dir, float threshold, int gamepadID, bool previousFrame = false);
 
-    /// Helper to evaluate stick/trigger deflection strength, remapped from [threshold, 1] to [0, 1].
+    /** @brief Helper to evaluate stick/trigger deflection strength, remapped from [threshold, 1] to [0, 1]. */
     static float getAxisDirectionStrength(GamepadAxisDir dir, float threshold, int gamepadID);
 
     static inline GLFWwindow* s_window = nullptr; ///< Active GLFW window context handle.
 
-    // Subsystems
     static inline KeyboardManager s_keyboard;     ///< Keyboard state and key history manager.
     static inline MouseManager    s_mouse;        ///< Mouse cursor, delta, and scroll manager.
     static inline GamepadManager  s_gamepad;      ///< Gamepad polling, axis, and dead zone manager.
 
-    // Action Storage
-    static inline std::unordered_map<std::string, std::vector<ActionBinding>> s_actions; ///< Maps action names to hardware bindings.
+    /// Maps action names to hardware bindings.
+    static inline std::unordered_map<std::string, std::vector<ActionBinding>> s_actions;
 };

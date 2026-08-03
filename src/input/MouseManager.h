@@ -5,52 +5,85 @@
 #include <glm/glm.hpp>
 #include <array>
 
-/// Handles mouse state tracking, position deltas, cursor locking, and scroll events.
+/// @brief Handles mouse state tracking, position deltas, cursor locking, and scroll events.
 class MouseManager {
 public:
     MouseManager() = default;
 
-    /// Initializes the Mouse Manager and attaches callbacks to the GLFW window.
-    /// @param window Pointer to the active GLFW window context.
+    /**
+     * @brief Initializes the Mouse Manager and attaches callbacks to the GLFW window.
+     *
+     * @param window Pointer to the active GLFW window context.
+     */
     void init(GLFWwindow* window);
 
-    /// Processes frame transitions and resets per-frame deltas.
-    /// @note Call once per frame at the start of the update pass.
+    /**
+     * @brief Processes frame transitions and resets per-frame deltas.
+     *
+     * @note Call once per frame at the start of the update pass.
+     */
     void update();
 
-    /// Locks (disables & hides) or unlocks the mouse cursor.
-    /// @param locked @c true to capture and lock cursor to window, @c false to enable normal pointer.
+    /**
+     * @brief Locks (disables & hides) or unlocks the mouse cursor.
+     *
+     * @param locked @c true to capture and lock cursor to window, @c false to enable normal pointer.
+     */
     void setCursorLocked(bool locked);
 
-    /// Checks whether the mouse cursor is currently captured and locked.
-    /// @return @c true if cursor is locked, @c false otherwise.
+    /**
+     * @brief Checks whether the mouse cursor is currently captured and locked.
+     *
+     * @return @c true if cursor is locked, @c false otherwise.
+     */
     [[nodiscard]] bool isCursorLocked() const { return m_cursorLocked; }
 
-    /// Gets the current absolute cursor position relative to the window.
-    /// @return Current screen space position of the cursor in pixels.
+    /**
+     * @brief Gets the current absolute cursor position relative to the window.
+     *
+     * @return Current screen space position of the cursor in pixels.
+     */
     [[nodiscard]] glm::vec2 getPosition() const { return m_position; }
 
-    /// Gets the mouse position delta (movement offset) since the last frame.
-    /// @return 2D vector representing cursor movement delta (X: horizontal, Y: vertical).
+    /**
+     * @brief Gets the mouse position delta (movement offset) since the last frame.
+     *
+     * @return 2D vector representing cursor movement delta (X: horizontal, Y: vertical).
+     */
     [[nodiscard]] glm::vec2 getDelta() const { return m_delta; }
 
-    /// Gets the scroll wheel offset accumulated during the current frame.
-    /// @return Scroll delta vector (Y component represents standard vertical scrolling).
+    /**
+     * @brief Gets the scroll wheel offset accumulated during the current frame.
+     *
+     * @return Scroll delta vector (Y component represents standard vertical scrolling).
+     */
     [[nodiscard]] glm::vec2 getScrollDelta() const { return m_scrollDelta; }
 
-    /// Checks whether a specific mouse button is currently held down.
-    /// @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
-    /// @return @c true if button is down, @c false otherwise.
+    /**
+     * @brief Checks whether a specific mouse button is currently held down.
+     *
+     * @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
+     *
+     * @return @c true if button is down, @c false otherwise.
+     */
     [[nodiscard]] bool isButtonDown(int button) const;
 
-    /// Checks whether a specific mouse button was pressed during the current frame.
-    /// @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
-    /// @return @c true only on the initial press frame, @c false otherwise.
+    /**
+     * @brief Checks whether a specific mouse button was pressed during the current frame.
+     *
+     * @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
+     *
+     * @return @c true only on the initial press frame, @c false otherwise.
+     */
     [[nodiscard]] bool isButtonJustPressed(int button) const;
 
-    /// Checks whether a specific mouse button was released during the current frame.
-    /// @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
-    /// @return @c true only on the release frame, @c false otherwise.
+    /**
+     * @brief Checks whether a specific mouse button was released during the current frame.
+     *
+     * @param button GLFW mouse button identifier (e.g., @c GLFW_MOUSE_BUTTON_LEFT).
+     *
+     * @return @c true only on the release frame, @c false otherwise.
+     */
     [[nodiscard]] bool isButtonJustReleased(int button) const;
 
 private:
