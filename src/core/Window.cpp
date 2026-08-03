@@ -114,6 +114,82 @@ void Window::clear(const float r, const float g, const float b, const float a) c
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Window::setWindowMode(const WindowMode mode) {
+    if (m_mode == mode) return;
+
+    // Get primary monitor using GLFW
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    if (!monitor) return;
+
+    // Get video mode supported by this monitor
+    const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+    if (!videoMode) return;
+
+    // Save windowed bounds before leaving Windowed mode
+    if (m_mode == WindowMode::Windowed) {
+        glfwGetWindowPos(m_handle, &m_windowedX, &m_windowedY);
+        glfwGetWindowSize(m_handle, &m_windowedWidth, &m_windowedHeight);
+    }
+
+    m_mode = mode;
+
+    switch (m_mode) {
+        case WindowMode::Windowed: {
+            // Re-enable window borders and restore windowed monitor target
+            glfwSetWindowAttrib(m_handle, GLFW_DECORATED, GLFW_TRUE);
+            glfwSetWindowMonitor(
+                m_handle,
+                nullptr,
+                m_windowedX,
+                m_windowedY,
+                m_windowedWidth,
+                m_windowedHeight,
+                GLFW_DONT_CARE
+            );
+            break;
+        }
+
+        case WindowMode::Borderless: {
+            int monitorX = 0, monitorY = 0;
+            glfwGetMonitorPos(monitor, &monitorX, &monitorY);
+
+            // Exit exclusive fullscreen state if active
+            glfwSetWindowMonitor(
+                m_handle,
+                nullptr,
+                monitorX,
+                monitorY,
+                videoMode->width,
+                videoMode->height,
+                GLFW_DONT_CARE
+            );
+
+            // Remove window title bar & borders, then fit to monitor dimensions
+            glfwSetWindowAttrib(m_handle, GLFW_DECORATED, GLFW_FALSE);
+            glfwSetWindowPos(m_handle, monitorX, monitorY);
+            glfwSetWindowSize(m_handle, videoMode->width, videoMode->height);
+            break;
+        }
+
+        case WindowMode::Fullscreen: {
+            // Re-enable decoration flag for when returning to windowed mode later
+            glfwSetWindowAttrib(m_handle, GLFW_DECORATED, GLFW_TRUE);
+
+            // Exclusive Hardware Fullscreen mode
+            glfwSetWindowMonitor(
+                m_handle,
+                monitor,
+                0,
+                0,
+                videoMode->width,
+                videoMode->height,
+                videoMode->refreshRate
+            );
+            break;
+        }
+    }
+}
+
 void Window::update() const {
     glfwSwapBuffers(m_handle);
 }

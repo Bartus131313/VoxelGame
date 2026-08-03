@@ -19,8 +19,14 @@ void Game::update(const float deltaTime) {
 
     // Handle game quit action
     if (Input::isActionJustPressed("game_quit")) {
-        glfwSetWindowShouldClose(m_window.getNativeHandle(), GLFW_TRUE);
+        m_window.close();
         return;
+    }
+
+    // Check if window fullscreen action was pressed
+    if (Input::isActionJustPressed("window_fullscreen")) {
+        const WindowMode currentMode = m_window.getWindowMode();
+        m_window.setWindowMode(currentMode == WindowMode::Fullscreen ? WindowMode::Windowed : WindowMode::Fullscreen);
     }
 
     // Toggle Cursor Lock / Release on M
@@ -28,11 +34,6 @@ void Game::update(const float deltaTime) {
         const bool currentLocked = Input::getMouse().isCursorLocked();
         Input::getMouse().setCursorLocked(!currentLocked);
         std::cout << "[Game] Cursor " << (!currentLocked ? "Locked" : "Unlocked") << std::endl;
-    }
-
-    // Check Mouse Scroll - DEBUG ONLY
-    if (const glm::vec2 scrollDelta = Input::getMouse().getScrollDelta(); scrollDelta.y != 0.0f) {
-        std::cout << "[Game] Mouse Scroll Y: " << scrollDelta.y << "\n";
     }
 
     // Update player
@@ -142,7 +143,11 @@ void Game::setupInputBindings() {
     // Create action for game quit
     Input::createAction("game_quit");
     Input::bindKey("game_quit", GLFW_KEY_ESCAPE);
-    Input::bindGamepadButton("game_quit", GLFW_GAMEPAD_BUTTON_GUIDE); // Fixed typo from earlier snippet
+    Input::bindGamepadButton("game_quit", GLFW_GAMEPAD_BUTTON_GUIDE);
+
+    // Create action for window fullscreen
+    Input::createAction("window_fullscreen");
+    Input::bindKey("window_fullscreen", GLFW_KEY_F11);
 }
 
 void Game::cleanup() {

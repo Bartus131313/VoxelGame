@@ -7,6 +7,13 @@
 
 #include "IWindowEventListener.h"
 
+/** @brief Display mode for the window. */
+enum class WindowMode {
+    Windowed,       ///< Standard windowed mode with window decorations (title bar, borders).
+    Borderless,     ///< Borderless fullscreen matching monitor resolution without mode changes.
+    Fullscreen      ///< Exclusive hardware fullscreen mode with mode switching.
+};
+
 /** @brief Wrapper around GLFW window lifecycle, OpenGL context creation, and frame operations. */
 class Window {
 public:
@@ -41,6 +48,14 @@ public:
      * @return @c true if window should close, @c false otherwise.
      */
     [[nodiscard]] bool shouldClose() const;
+
+
+    /**
+     * @brief Changes the display mode of the window.
+     *
+     * @param mode Desired display mode (@c Windowed, @c WindowedFullscreen, or @c Fullscreen).
+     */
+    void setWindowMode(WindowMode mode);
 
     /**
      * @brief Swaps front and back rendering buffers and processes OS window events.
@@ -80,7 +95,21 @@ public:
      */
     [[nodiscard]] GLFWwindow* getNativeHandle() const { return m_handle; }
 
-    /** @biref Closes window and frees all resources. */
+    /**
+     * @brief Gets the window title.
+     *
+     * @return Title of the window.
+     */
+    [[nodiscard]] std::string getTitle() const { return m_title; }
+
+    /**
+     * @brief Gets the current display mode of the window.
+     *
+     * @return Current display mode.
+     */
+    [[nodiscard]] WindowMode getWindowMode() const { return m_mode; }
+
+    /** @brief Closes window and frees all resources. */
     void close() const;
 
 private:
@@ -106,6 +135,12 @@ private:
     int m_width = 0;                ///< Current window width in pixels.
     int m_height = 0;               ///< Current window height in pixels.
     std::string m_title;            ///< Window title bar string.
+
+    WindowMode m_mode = WindowMode::Windowed;   ///< Active display mode.
+    int m_windowedX = 0;                        ///< Saved window X coordinate when leaving windowed mode.
+    int m_windowedY = 0;                        ///< Saved window Y coordinate when leaving windowed mode.
+    int m_windowedWidth = 0;                    ///< Saved window width when leaving windowed mode.
+    int m_windowedHeight = 0;                   ///< Saved window height when leaving windowed mode.
 
     /// List which holds all window event listeners.
     std::vector<IWindowEventListener*> m_listeners;
