@@ -54,8 +54,8 @@ void MouseManager::cursorPosCallback(GLFWwindow* window, const double xPos, cons
     }
 
     // Calculate position change since last frame
-    mouse.m_delta.x = currentPos.x - mouse.m_position.x;
-    mouse.m_delta.y = mouse.m_position.y - currentPos.y; // Invert Y so up is positive
+    mouse.m_delta.x += currentPos.x - mouse.m_position.x;
+    mouse.m_delta.y += mouse.m_position.y - currentPos.y; // Invert Y so up is positive
     mouse.m_position = currentPos;
 }
 
