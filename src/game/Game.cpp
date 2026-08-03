@@ -141,5 +141,7 @@ void Game::setupInputBindings() {
 }
 
 void Game::cleanup() {
+    FontManager::cleanup();
+    ShaderManager::cleanup();
     std::cout << "[Game] Shutting down application...\n";
 }
