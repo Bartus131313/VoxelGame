@@ -7,7 +7,10 @@
 #include "glm/ext/matrix_transform.hpp"
 
 Game::Game()
-    : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT) {
+    : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
+{
+    // Register this game as listener for all window events
+    m_window.addEventListener(this);
 }
 
 void Game::update(const float deltaTime) {
@@ -33,11 +36,7 @@ void Game::update(const float deltaTime) {
     }
 
     // Update player
-    m_player.getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
     m_player.update(deltaTime);
-
-    // Set the canvas size to current one
-    m_canvas.setSize(m_window.getWidth(), m_window.getHeight());
 }
 
 void Game::render() {
@@ -57,6 +56,14 @@ void Game::render() {
 
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
     m_canvas.render();
+}
+
+void Game::onWindowResize(const int width, const int height) {
+    // Set the canvas size to the current one
+    m_canvas.setSize(width, height);
+
+    // Update player camera aspect ratio
+    m_player.getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
 }
 
 int Game::run() {

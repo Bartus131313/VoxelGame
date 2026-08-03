@@ -47,6 +47,7 @@ add_executable(${PROJECT_NAME}
         src/game/render/camera/Camera3D.h
         src/game/entity/Player.cpp
         src/game/entity/Player.h
+        src/core/IWindowEventListener.h
 )
 
 # Include Directories for Headers

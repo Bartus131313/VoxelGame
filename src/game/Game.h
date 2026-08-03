@@ -11,7 +11,7 @@
  * @brief Main application controller that manages the window lifecycle,
  * input system, and primary game loop.
  */
-class Game {
+class Game : public IWindowEventListener {
 public:
     static constexpr auto WINDOW_TITLE  = "Voxel Game"; ///< Title displayed in the window header.
     static constexpr int  WINDOW_WIDTH  = 1280;         ///< Initial rendering width in pixels.
@@ -21,11 +21,19 @@ public:
     Game();
 
     /** @brief Destroys the Game application instance and releases resources. */
-    ~Game() = default;
+    ~Game() override = default;
 
     // Prevent copying to maintain unique engine instance ownership
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
+
+    /**
+     * @brief Called by Window class when framebuffer size was changed.
+     *
+     * @param width Width of the window.
+     * @param height Height of the window.
+     */
+    void onWindowResize(int width, int height) override;
 
     /**
      * @brief Gets calculated FPS.

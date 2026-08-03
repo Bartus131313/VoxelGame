@@ -48,6 +48,10 @@ Window& Window::operator=(Window&& other) noexcept {
     return *this;
 }
 
+Window* Window::getWindowInstance(GLFWwindow* handle) {
+    return static_cast<Window*>(glfwGetWindowUserPointer(handle));
+}
+
 void Window::init() {
     // Check if GLFW initializes successfully
     if (!glfwInit()) {
@@ -119,9 +123,15 @@ void Window::close() const {
 }
 
 void Window::framebufferSizeCallback(GLFWwindow* windowHandle, const int width, int const height) {
-    if (auto* window = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))) {
-        window->m_width = width;
-        window->m_height = height;
-        glViewport(0, 0, width, height);
+    auto* window = getWindowInstance(windowHandle);
+    if (!window) return;
+
+    window->m_width = width;
+    window->m_height = height;
+    glViewport(0, 0, width, height);
+
+    // Forward to all registered listeners
+    for (auto* listener : window->m_listeners) {
+        listener->onWindowResize(width, height);
     }
 }

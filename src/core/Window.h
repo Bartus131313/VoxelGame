@@ -3,6 +3,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <vector>
+
+#include "IWindowEventListener.h"
 
 /** @brief Wrapper around GLFW window lifecycle, OpenGL context creation, and frame operations. */
 class Window {
@@ -26,6 +29,11 @@ public:
     // Allow move semantics for transferring window ownership
     Window(Window&& other) noexcept;
     Window& operator=(Window&& other) noexcept;
+
+    // Single subscription method for ALL window events
+    void addEventListener(IWindowEventListener* listener) {
+        m_listeners.push_back(listener);
+    }
 
     /**
      * @biref Checks whether the user or OS requested the window to close.
@@ -81,11 +89,24 @@ private:
     /** @biref Centers the window. */
     void centerWindow() const;
 
-    // Routes GLFW C callbacks into instance methods
+    /**
+     * @brief Retrieves the C++ Window instance associated with a native GLFW window handle.
+     *
+     * Helper function used inside static GLFW callbacks to extract the C++ instance
+     * bound via @c glfwSetWindowUserPointer.
+     *
+     * @param handle Pointer to the native GLFW window handle.
+     * @return Pointer to the associated C++ Window instance, or @c nullptr if not set.
+     */
+    static Window* getWindowInstance(GLFWwindow* handle);
+
     static void framebufferSizeCallback(GLFWwindow* windowHandle, int width, int height);
 
     GLFWwindow* m_handle = nullptr; ///< Native GLFW window handle.
     int m_width = 0;                ///< Current window width in pixels.
     int m_height = 0;               ///< Current window height in pixels.
     std::string m_title;            ///< Window title bar string.
+
+    /// List which holds all window event listeners.
+    std::vector<IWindowEventListener*> m_listeners;
 };
