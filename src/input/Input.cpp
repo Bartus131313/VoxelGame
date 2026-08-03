@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 void Input::init(GLFWwindow* window) {
@@ -120,11 +122,12 @@ bool Input::isActionJustPressed(const std::string& actionName, const int playerI
             case InputType::GamepadButton:
                 if (s_gamepad.isButtonJustPressed(binding.code, gamepadID)) return true;
                 break;
-            case InputType::GamepadAxis:
+            case InputType::GamepadAxis: {
                 const bool current  = isAxisDirectionActive(binding.axisDir, binding.threshold, gamepadID, false);
                 const bool previous = isAxisDirectionActive(binding.axisDir, binding.threshold, gamepadID, true);
                 if (current && !previous) return true;
                 break;
+            }
         }
     }
     return false;
@@ -150,28 +153,61 @@ bool Input::isActionJustReleased(const std::string& actionName, const int player
             case InputType::GamepadButton:
                 if (s_gamepad.isButtonJustReleased(binding.code, gamepadID)) return true;
                 break;
-            case InputType::GamepadAxis:
+            case InputType::GamepadAxis: {
                 const bool current  = isAxisDirectionActive(binding.axisDir, binding.threshold, gamepadID, false);
                 const bool previous = isAxisDirectionActive(binding.axisDir, binding.threshold, gamepadID, true);
                 if (!current && previous) return true;
                 break;
+            }
         }
     }
 
     return false;
 }
 
+float Input::getActionStrength(const std::string& actionName, const int playerIndex) {
+    const auto it = s_actions.find(actionName);
+    if (it == s_actions.end()) {
+        std::cerr << "[Input::getActionStrength] Action does not exist: " << actionName << std::endl;
+        return 0.0f;
+    }
+
+    const int gamepadID = GLFW_JOYSTICK_1 + playerIndex;
+    float strength = 0.0f;
+
+    for (const ActionBinding binding : it->second) {
+        switch (binding.type) {
+            case InputType::KeyboardKey:
+                if (playerIndex == 0 && s_keyboard.isKeyDown(binding.code)) strength = std::max(strength, 1.0f);
+                break;
+            case InputType::MouseButton:
+                if (playerIndex == 0 && s_mouse.isButtonDown(binding.code)) strength = std::max(strength, 1.0f);
+                break;
+            case InputType::GamepadButton:
+                if (s_gamepad.isButtonDown(binding.code, gamepadID)) strength = std::max(strength, 1.0f);
+                break;
+            case InputType::GamepadAxis:
+                strength = std::max(strength, getAxisDirectionStrength(binding.axisDir, binding.threshold, gamepadID));
+                break;
+        }
+    }
+    return strength;
+}
+
 glm::vec2 Input::getVector(const std::string& left, const std::string& right,
                            const std::string& up, const std::string& down,
                            const int playerIndex) {
     glm::vec2 dir(0.0f);
-    if (isActionPressed(right, playerIndex)) dir.x += 1.0f;
-    if (isActionPressed(left,  playerIndex)) dir.x -= 1.0f;
-    if (isActionPressed(up,    playerIndex)) dir.y += 1.0f;
-    if (isActionPressed(down,  playerIndex)) dir.y -= 1.0f;
+    if (!right.empty()) dir.x += getActionStrength(right, playerIndex);
+    if (!left.empty())  dir.x -= getActionStrength(left, playerIndex);
+    if (!up.empty())    dir.y += getActionStrength(up, playerIndex);
+    if (!down.empty())  dir.y -= getActionStrength(down, playerIndex);
 
-    if (glm::length(dir) > 0.0f) {
-        dir = glm::normalize(dir);
+    // Only clamp when the combined magnitude would exceed 1 (e.g. two full-strength
+    // digital inputs on a diagonal). Analog partial deflection keeps its true magnitude.
+    const float length = glm::length(dir);
+    if (length > 1.0f) {
+        dir /= length;
     }
     return dir;
 }
@@ -207,4 +243,61 @@ bool Input::isAxisDirectionActive(const GamepadAxisDir dir, const float threshol
             return s_gamepad.getRightTrigger(gamepadID) > threshold;
     }
     return false;
+}
+
+/// Helper to compute stick/trigger deflection strength in [0, 1], remapped so that
+/// `threshold` maps to 0.0 and full deflection (1.0) maps to 1.0.
+float Input::getAxisDirectionStrength(const GamepadAxisDir dir, const float threshold, const int gamepadID) {
+    if (!s_gamepad.isConnected(gamepadID)) return 0.0f;
+
+    // Remaps a raw magnitude in [0, 1] so that values <= threshold become 0,
+    // and values from threshold..1 are rescaled to 0..1.
+    const auto remap = [threshold](const float rawMagnitude) -> float {
+        if (rawMagnitude <= threshold) return 0.0f;
+        if (threshold >= 1.0f) return 0.0f; // avoid div-by-zero for degenerate thresholds
+        const float t = (rawMagnitude - threshold) / (1.0f - threshold);
+        return std::clamp(t, 0.0f, 1.0f);
+    };
+
+    switch (dir) {
+        case GamepadAxisDir::LeftStickLeft: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_LEFT_X, false, gamepadID);
+            return v < 0.0f ? remap(-v) : 0.0f;
+        }
+        case GamepadAxisDir::LeftStickRight: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_LEFT_X, false, gamepadID);
+            return v > 0.0f ? remap(v) : 0.0f;
+        }
+        case GamepadAxisDir::LeftStickUp: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_LEFT_Y, false, gamepadID);
+            return v < 0.0f ? remap(-v) : 0.0f;
+        }
+        case GamepadAxisDir::LeftStickDown: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_LEFT_Y, false, gamepadID);
+            return v > 0.0f ? remap(v) : 0.0f;
+        }
+
+        case GamepadAxisDir::RightStickLeft: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_RIGHT_X, false, gamepadID);
+            return v < 0.0f ? remap(-v) : 0.0f;
+        }
+        case GamepadAxisDir::RightStickRight: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_RIGHT_X, false, gamepadID);
+            return v > 0.0f ? remap(v) : 0.0f;
+        }
+        case GamepadAxisDir::RightStickUp: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_RIGHT_Y, false, gamepadID);
+            return v < 0.0f ? remap(-v) : 0.0f;
+        }
+        case GamepadAxisDir::RightStickDown: {
+            const float v = s_gamepad.getRawAxis(GLFW_GAMEPAD_AXIS_RIGHT_Y, false, gamepadID);
+            return v > 0.0f ? remap(v) : 0.0f;
+        }
+
+        case GamepadAxisDir::LeftTrigger:
+            return remap(s_gamepad.getLeftTrigger(gamepadID));
+        case GamepadAxisDir::RightTrigger:
+            return remap(s_gamepad.getRightTrigger(gamepadID));
+    }
+    return 0.0f;
 }

@@ -105,7 +105,7 @@ public:
      * @param direction The analog axis direction (e.g., @c GamepadAxisDir::LeftStickUp).
      * @param threshold Deflection sensitivity threshold from 0.0 to 1.0 (default: 0.5).
      */
-    static void bindGamepadAxis(const std::string& actionName, GamepadAxisDir direction, float threshold = 0.0f);
+    static void bindGamepadAxis(const std::string& actionName, GamepadAxisDir direction, float threshold = GamepadManager::DEFAULT_DEAD_ZONE);
 
     /**
      * @brief Checks whether an action is currently being held down.
@@ -142,17 +142,36 @@ public:
     static bool isActionJustReleased(const std::string& actionName, int playerIndex = 0);
 
     /**
+     * @brief Gets the analog strength (0.0 - 1.0) of an action.
+     *
+     * Digital sources (keyboard, mouse, gamepad buttons) return either 0.0f or 1.0f.
+     * Gamepad stick/trigger sources return a value proportional to how far the stick
+     * or trigger is deflected, remapped so that the configured dead-zone @c threshold
+     * maps to 0.0 and full deflection maps to 1.0. If multiple bindings are attached
+     * to the action, the strongest one wins.
+     *
+     * @param actionName The name of the action to query.
+     * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
+     * @return A value from 0.0f (inactive) to 1.0f (fully active/deflected).
+     */
+    static float getActionStrength(const std::string& actionName, int playerIndex = 0);
+
+    /**
      * @brief Calculates a normalized 2D movement vector from four directional actions.
      *
      * Combines opposing axis inputs (e.g., WASD or D-Pad) into a single directional vector.
-     * Automatically normalizes non-zero vectors so moving diagonally doesn't make the player move faster.
+     * Gamepad stick bindings contribute their analog deflection (via getActionStrength()),
+     * so partial stick pushes yield a proportionally shorter vector, while keyboard/button
+     * bindings contribute a full 1.0f. The resulting vector's length is clamped to 1.0f
+     * (so diagonals don't exceed full speed) but is NOT force-normalized, preserving analog
+     * partial magnitudes.
      *
      * @param left Action name for -X direction.
      * @param right Action name for +X direction.
      * @param up Action name for +Y direction.
      * @param down Action name for -Y direction.
      * @param playerIndex Specific player index used for multiple players on one device. (Max index = 15)
-     * @return A normalized @c glm::vec2 direction vector, or @c glm::vec2(0.0f) if no inputs are active.
+     * @return A @c glm::vec2 direction vector with magnitude in [0.0f, 1.0f].
      */
     static glm::vec2 getVector(const std::string& left, const std::string& right,
                                const std::string& up, const std::string& down, int playerIndex = 0);
@@ -163,6 +182,9 @@ public:
 
 private:
     static bool isAxisDirectionActive(GamepadAxisDir dir, float threshold, int gamepadID, bool previousFrame = false);
+
+    /// Helper to evaluate stick/trigger deflection strength, remapped from [threshold, 1] to [0, 1].
+    static float getAxisDirectionStrength(GamepadAxisDir dir, float threshold, int gamepadID);
 
     static inline GLFWwindow* s_window = nullptr; ///< Active GLFW window context handle.
 
