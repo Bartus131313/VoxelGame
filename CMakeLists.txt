@@ -30,8 +30,8 @@ add_executable(${PROJECT_NAME}
         src/input/Input.cpp
         src/game/Game.cpp
         src/game/Game.h
-        src/game/render/Shader.cpp
-        src/game/render/Shader.h
+        src/game/render/shader/Shader.cpp
+        src/game/render/shader/Shader.h
         src/game/render/font/FontRenderer.cpp
         src/game/render/font/FontRenderer.h
         src/game/render/Vertex.h
@@ -41,6 +41,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/font/FontManager.cpp
         src/game/render/font/FontManager.h
         src/game/ui/Canvas.cpp
+        src/game/render/shader/ShaderManager.cpp
+        src/game/render/shader/ShaderManager.h
 )
 
 # Include Directories for Headers

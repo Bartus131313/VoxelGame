@@ -3,7 +3,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include "FontManager.h"
-#include "../Shader.h"
+#include "../shader/Shader.h"
 
 /// Handles rendering of text using cached FontData and optimized GPU streaming.
 class FontRenderer {
@@ -17,6 +17,6 @@ public:
     /// @param y Screen Y coordinate (pixels).
     /// @param scale Scaling factor for the text size.
     /// @param color RGBA color of the text.
-    static void renderText(const Shader& shader, const FontData* fontData, const std::string& text,
+    static void renderText(const Shader* shader, const FontData* fontData, const std::string& text,
                            int x, int y, float scale, const glm::vec4& color);
 };

@@ -6,7 +6,7 @@
 
 /// Represents type of shader compilation used for error check.
 enum ShaderCompilationType {
-    Vertex, Fragment, Program
+    Vertex, Fragment, Geometry, Program, Compute
 };
 
 /// Encapsulates an OpenGL shader program compiled from vertex and fragment GLSL files.
@@ -19,11 +19,16 @@ public:
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
 
-    /// Loads, compiles, and links a vertex and fragment shader from disk.
+    // Enable moving for efficient storage inside standard containers
+    Shader(Shader&&) noexcept = default;
+    Shader& operator=(Shader&&) noexcept = default;
+
+    /// Loads, compiles, and links a shader program from disk.
     /// @param vertexPath Path to the GLSL vertex shader file.
     /// @param fragmentPath Path to the GLSL fragment shader file.
-    /// @return True if compilation and linking succeed, false otherwise.
-    bool loadFromFile(const std::string& vertexPath, const std::string& fragmentPath);
+    /// @param geometryPath Optional path to the GLSL geometry shader file.
+    /// @return @c True if compilation and linking succeed, @c false otherwise.
+    bool loadFromFile(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 
     /// Activates this shader program for rendering passes.
     void use() const;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../render/Shader.h"
 
 /// Represents 2D element that will be rendered on UI.
 class UIElement {
@@ -13,8 +12,8 @@ public:
     virtual void update(float deltaTime) {}
 
     /// Renders the whole UI Element, called on render pass.
-    /// @param shader Shader that will be used to render it.
-    virtual void render(const Shader& shader) = 0;
+    /// @param projectionMatrix Matrix used to project the element on 2D screen.
+    virtual void render(glm::mat4 projectionMatrix) = 0;
 
     /// Sets position of UI Element to given one.
     /// @param x X-coord of the element's position.

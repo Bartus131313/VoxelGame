@@ -5,7 +5,7 @@
 
 #include "../Vertex.h"
 
-void FontRenderer::renderText(const Shader& shader, const FontData* fontData, const std::string& text,
+void FontRenderer::renderText(const Shader* shader, const FontData* fontData, const std::string& text,
                               const int x, const int y, const float scale, const glm::vec4& color) {
     if (!fontData || text.empty()) return;
 
@@ -14,8 +14,8 @@ void FontRenderer::renderText(const Shader& shader, const FontData* fontData, co
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Bind Shader and Set Uniforms
-    shader.setVec4("textColor", color);
-    shader.setInt("textTexture", 0);
+    shader->setVec4("textColor", color);
+    shader->setInt("textTexture", 0);
 
     // Bind Font Texture
     glActiveTexture(GL_TEXTURE0);

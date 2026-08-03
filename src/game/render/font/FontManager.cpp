@@ -7,20 +7,19 @@
 
 #include "../Vertex.h"
 
-// Initialize static member
-std::unordered_map<std::string, std::unique_ptr<FontData>> FontManager::m_fonts;
+std::unordered_map<std::string, std::shared_ptr<FontData>> FontManager::m_fonts;
 
-FontData* FontManager::loadFont(const std::string& fontFileName, const int fontSize) {
+std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName, const int fontSize) {
     // Create a safe, unique cache key (e.g., "arial.ttf-32")
-    std::string cacheKey = fontFileName + "-" + std::to_string(fontSize);
+    const std::string cacheKey = fontFileName + "-" + std::to_string(fontSize);
 
     // Check if font already exists in cache
-    if (auto it = m_fonts.find(cacheKey); it != m_fonts.end()) {
-        return it->second.get();
+    if (const auto it = m_fonts.find(cacheKey); it != m_fonts.end()) {
+        return it->second;
     }
 
     // Build full path
-    std::string fullPath = std::string(FONTS_PATH) + fontFileName;
+    const std::string fullPath = std::string(FONTS_PATH) + fontFileName;
 
     // Read TTF file into memory
     std::ifstream file(fullPath, std::ios::binary | std::ios::ate);
@@ -37,7 +36,7 @@ FontData* FontManager::loadFont(const std::string& fontFileName, const int fontS
     }
 
     // Allocate heap-backed FontData wrapped in a unique_ptr
-    auto fontData = std::make_unique<FontData>();
+    auto fontData = std::make_shared<FontData>();
     fontData->charData.resize(96); // ASCII range 32 to 127
 
     // Allocate temporary bitmap for packing
@@ -94,14 +93,12 @@ FontData* FontManager::loadFont(const std::string& fontFileName, const int fontS
 
     std::cout << "[FontManager::loadFont] Successfully loaded and packed font: " << fullPath << " (" << fontSize << "px)\n";
 
-    // Emplace into map and return raw pointer safely from the map node
-    auto [it, inserted] = m_fonts.emplace(cacheKey, std::move(fontData));
-    return it->second.get();
+    // Cache and return
+    m_fonts[cacheKey] = fontData;
+    return fontData;
 }
 
 void FontManager::cleanup() {
-    // Clearing the map automatically destroys all unique_ptrs.
-    // Their destructors will automatically call glDeleteTextures, glDeleteBuffers, etc.
     m_fonts.clear();
     std::cout << "[FontManager::cleanup] Cleaned up all cached fonts.\n";
 }

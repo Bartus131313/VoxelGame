@@ -9,15 +9,13 @@ Shader::~Shader() {
     if (m_programID != 0) glDeleteProgram(m_programID);
 }
 
-bool Shader::loadFromFile(const std::string& vertexPath, const std::string& fragmentPath) {
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
+bool Shader::loadFromFile(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath) {
+    std::string vertexCode, fragmentCode, geometryCode;
+    std::ifstream vShaderFile, fShaderFile, gShaderFile;
 
-    // Ensure ifstream objects can throw exceptions on failure
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     try {
         vShaderFile.open(vertexPath);
@@ -27,60 +25,68 @@ bool Shader::loadFromFile(const std::string& vertexPath, const std::string& frag
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();
 
-        vShaderFile.close();
-        fShaderFile.close();
-
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
+
+        // Only read geometry shader if a path was provided
+        if (!geometryPath.empty()) {
+            gShaderFile.open(geometryPath);
+            std::stringstream gShaderStream;
+            gShaderStream << gShaderFile.rdbuf();
+            geometryCode = gShaderStream.str();
+        }
     }
     catch (const std::ifstream::failure& e) {
-        std::cerr << "[Shader] ERROR: Failed to read shader files from disk.\n"
-                  << "  Vertex Path: " << vertexPath << "\n"
-                  << "  Fragment Path: " << fragmentPath << "\n"
-                  << "  Exception: " << e.what() << "\n";
+        std::cerr << "[Shader] ERROR: Failed to read shader files from disk.\n";
         return false;
     }
 
+    // Compile Vertex
     const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
-
-    // Compile Vertex Shader
     GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
-    if (!checkCompileErrors(vertex, Vertex)) {
-        glDeleteShader(vertex);
-        return false;
-    }
+    if (!checkCompileErrors(vertex, Vertex)) return false;
 
-    // Compile Fragment Shader
+    // Compile Fragment
+    const char* fShaderCode = fragmentCode.c_str();
     GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
-    if (!checkCompileErrors(fragment, Fragment)) {
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-        return false;
+    if (!checkCompileErrors(fragment, Fragment)) return false;
+
+    // Compile Geometry (Optional)
+    GLuint geometry = 0;
+    if (!geometryPath.empty()) {
+        const char* gShaderCode = geometryCode.c_str();
+        geometry = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometry, 1, &gShaderCode, nullptr);
+        glCompileShader(geometry);
+        if (!checkCompileErrors(geometry, Geometry)) return false;
     }
 
     // Link Shader Program
     m_programID = glCreateProgram();
     glAttachShader(m_programID, vertex);
     glAttachShader(m_programID, fragment);
+    if (!geometryPath.empty()) {
+        glAttachShader(m_programID, geometry);
+    }
     glLinkProgram(m_programID);
+
+    // Clean up
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+    if (!geometryPath.empty()) {
+        glDeleteShader(geometry);
+    }
+
     if (!checkCompileErrors(m_programID, Program)) {
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-        glDeleteProgram(m_programID);
         m_programID = 0;
         return false;
     }
 
-    // Clean up shaders once linked into the program
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-
-    std::cout << "[Shader] Successfully compiled and linked: " << vertexPath << " & " << fragmentPath << "\n";
+    std::cout << "[Shader] Successfully compiled and linked: " << vertexPath << "\n";
     return true;
 }
 

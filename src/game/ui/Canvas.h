@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "UIElement.h"
-#include "../render/Shader.h"
+#include "../render/shader/Shader.h"
 #include "glm/ext/matrix_clip_space.hpp"
 
 /// Manages a collection of UI elements, handles Z-index sorting, and renders them
@@ -38,7 +38,6 @@ public:
     void render() const;
 
 private:
-    Shader m_shader;                                    ///< Shader program used for rendering UI graphics and text.
     float m_width{};                                    ///< Current canvas viewport width in pixels.
     float m_height{};                                   ///< Current canvas viewport height in pixels.
     glm::mat4 m_projection{};                           ///< Standard unscaled orthographic projection matrix.
