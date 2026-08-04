@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 
+#include "../render/camera/Camera3D.h"
+
 /**
  * @brief Base class for anything that exists in the game world with a position and velocity.
  *
@@ -43,13 +45,20 @@ public:
     virtual void update(float deltaTime);
 
     /**
+     * @brief Renders entity. That method is optional as not every entity needs to be rendered.
+     *
+     * @param camera @c Camera3D used to render entity.
+     */
+    virtual void render(const Camera3D& camera) {}
+
+    /**
      * @brief Returns the unique runtime identifier of this entity.
      *
      * Useful for a future EntityManager/World to track, look up, or network-sync entities.
      *
      * @return Unique entity ID, stable for the lifetime of the entity instance.
      */
-    [[nodiscard]] std::uint64_t getId() const { return m_id; }
+    [[nodiscard]] uint64_t getId() const { return m_id; }
 
     /**
      * @brief Returns the world space position of the entity.

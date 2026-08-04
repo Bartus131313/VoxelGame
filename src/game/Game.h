@@ -6,6 +6,7 @@
 #include "render/sky/SkyRenderer.h"
 #include "ui/Canvas.h"
 #include "ui/elements/UILabel.h"
+#include "world/World.h"
 
 /**
  * @brief Main application controller that manages the window lifecycle,
@@ -75,14 +76,16 @@ private:
     Canvas m_canvas;                                    ///< Debug UI canvas used to render some debug info.
     std::shared_ptr<UILabel> m_fpsLabel = nullptr;      ///< Debug label that displays FPS.
 
-    Player m_player{};                                  ///< Test local player functioning as a drone camera.
-    std::shared_ptr<Shader> m_testShader = nullptr;     ///< Test shader used to paint triangle red.
-    GLuint m_testVAO{}, m_testVBO{};                    ///< Test VAO and VBO used to draw the triangle.
-    glm::mat4 m_testModelMatrix = glm::mat4(1.0f);    ///< Test model matrix for the triangle.
+    World m_world;
 
-    SkyRenderer m_skyRenderer{};    ///< Test procedural sky.
-    std::int64_t m_gameTicks{0};    ///< Absolute game tick counter.
-    float m_tickAccumulator{};      ///< Fractional-tick carryover between frames.
+    // Player m_player{};                                  ///< Test local player functioning as a drone camera.
+    // std::shared_ptr<Shader> m_testShader = nullptr;     ///< Test shader used to paint triangle red.
+    // GLuint m_testVAO{}, m_testVBO{};                    ///< Test VAO and VBO used to draw the triangle.
+    // glm::mat4 m_testModelMatrix = glm::mat4(1.0f);    ///< Test model matrix for the triangle.
+
+    // SkyRenderer m_skyRenderer{};    ///< Test procedural sky.
+    // std::int64_t m_gameTicks{0};    ///< Absolute game tick counter.
+    // float m_tickAccumulator{};      ///< Fractional-tick carryover between frames.
 
     double m_lastUpdateTime{};      ///< Last time when game was updated.
     double m_lastRenderTime{};      ///< Last time when game was rendered.

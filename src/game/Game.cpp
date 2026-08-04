@@ -42,41 +42,32 @@ void Game::update(const float deltaTime) {
         LOG_DEBUG("Cursor {}", !currentLocked ? "Locked" : "Unlocked");
     }
 
-    // Update player
-    m_player.update(deltaTime);
-
-    // Advance the game clock. Accumulated as float ticks then truncated so partial-tick
-    // drift doesn't get lost across frames of varying deltaTime.
-    m_tickAccumulator += deltaTime * TICKS_PER_SECOND;
-    while (m_tickAccumulator >= 1.0f) {
-        m_gameTicks++;
-        m_tickAccumulator -= 1.0f;
-    }
-
-    // Update sky renderer with game ticks
-    m_skyRenderer.update(m_gameTicks);
+    // Update world
+    m_world.update(deltaTime);
 }
 
 void Game::render() {
     // Clear background using Sky Blue color
     Renderer::clear(0.5f, 0.8f, 1.0f);
 
-    const auto viewMatrix = m_player.getCamera().getViewMatrix();
-    const auto projectionMatrix = m_player.getCamera().getProjectionMatrix();
+    m_world.render();
 
-    // Render procedural sky
-    m_skyRenderer.render(viewMatrix, projectionMatrix);
-
-    // Render test triangle
-    if (m_testShader) {
-        m_testShader->use();
-        m_testShader->setMat4("model", m_testModelMatrix);
-        m_testShader->setMat4("view", viewMatrix);
-        m_testShader->setMat4("projection", projectionMatrix);
-
-        glBindVertexArray(m_testVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-    }
+    // const auto viewMatrix = m_player.getCamera().getViewMatrix();
+    // const auto projectionMatrix = m_player.getCamera().getProjectionMatrix();
+    //
+    // // Render procedural sky
+    // m_skyRenderer.render(viewMatrix, projectionMatrix);
+    //
+    // // Render test triangle
+    // if (m_testShader) {
+    //     m_testShader->use();
+    //     m_testShader->setMat4("model", m_testModelMatrix);
+    //     m_testShader->setMat4("view", viewMatrix);
+    //     m_testShader->setMat4("projection", projectionMatrix);
+    //
+    //     glBindVertexArray(m_testVAO);
+    //     glDrawArrays(GL_TRIANGLES, 0, 3);
+    // }
 
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
     m_canvas.render();
@@ -89,8 +80,10 @@ void Game::onWindowResize(const int width, const int height) {
     // Set the canvas size to the current one
     m_canvas.setSize(width, height);
 
-    // Update player camera aspect ratio
-    m_player.getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
+    // Update local player camera aspect ratio
+    if (Player* localPlayer = m_world.getLocalPlayer()) {
+        localPlayer->getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
+    }
 }
 
 int Game::run() {
@@ -113,31 +106,25 @@ int Game::run() {
     m_fpsLabel->setPosition(20, 20);
     m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
 
-    // Setup test triangle rendering
-    m_testModelMatrix = glm::translate(m_testModelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
-    m_testShader = ShaderManager::loadShader("test");
-
-    constexpr float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
-    };
-
-    glGenVertexArrays(1, &m_testVAO);
-    glGenBuffers(1, &m_testVBO);
-
-    glBindVertexArray(m_testVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
-    glEnableVertexAttribArray(0);
-
-    // Setup procedural sky
-    m_skyRenderer.init(
-        "environment/celestial/sun.png",
-        "environment/celestial/moon_phases.png"
-        );
+    // // Setup test triangle rendering
+    // m_testModelMatrix = glm::translate(m_testModelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
+    // m_testShader = ShaderManager::loadShader("test");
+    //
+    // constexpr float vertices[] = {
+    //     -0.5f, -0.5f, 0.0f,
+    //      0.5f, -0.5f, 0.0f,
+    //      0.0f,  0.5f, 0.0f
+    // };
+    //
+    // glGenVertexArrays(1, &m_testVAO);
+    // glGenBuffers(1, &m_testVBO);
+    //
+    // glBindVertexArray(m_testVAO);
+    // glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
+    // glEnableVertexAttribArray(0);
 
     LOG_INFO("Game initialized.");
 
@@ -188,8 +175,8 @@ void Game::cleanup() {
     ShaderManager::cleanup();
     TextureManager::cleanup();
 
-    glDeleteBuffers(1, &m_testVBO);
-    glDeleteVertexArrays(1, &m_testVAO);
+    // glDeleteBuffers(1, &m_testVBO);
+    // glDeleteVertexArrays(1, &m_testVAO);
 
     LOG_INFO("Shutting down application...");
 }
