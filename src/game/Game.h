@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../core/Window.h"
-#include "entity/Player.h"
+#include "entity/impl/Player.h"
 #include "render/mesh/impl/SkyboxMesh.h"
 #include "render/sky/SkyRenderer.h"
 #include "ui/Canvas.h"

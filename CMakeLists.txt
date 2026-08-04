@@ -45,8 +45,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/shader/ShaderManager.h
         src/game/render/camera/Camera3D.cpp
         src/game/render/camera/Camera3D.h
-        src/game/entity/Player.cpp
-        src/game/entity/Player.h
+        src/game/entity/impl/Player.cpp
+        src/game/entity/impl/Player.h
         src/core/IWindowEventListener.h
         src/game/render/mesh/Mesh.h
         src/game/render/mesh/impl/StaticMesh.cpp
@@ -59,6 +59,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/sky/SkyRenderer.h
         src/game/render/Renderer.cpp
         src/game/render/Renderer.h
+        src/game/entity/Entity.cpp
+        src/game/entity/Entity.h
 )
 
 # Include Directories for Headers

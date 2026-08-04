@@ -1,13 +1,11 @@
 #include "Player.h"
 
 #include <algorithm>
-#include <iostream>
-#include <ostream>
 
-#include "../../input/Input.h"
+#include "../../../input/Input.h"
 
-Player::Player(glm::vec3 startPosition)
-        : m_position(startPosition), m_camera(startPosition + glm::vec3(0.0f, m_eyeHeight, 0.0f)) {
+Player::Player(const glm::vec3 startPosition)
+        : Entity(startPosition), m_camera(startPosition + glm::vec3(0.0f, m_eyeHeight, 0.0f)) {
     // Setup all movement actions
     Input::createAction("move_forward");
     Input::bindKey("move_forward", GLFW_KEY_W);
@@ -74,4 +72,9 @@ void Player::update(const float deltaTime) {
 
     // Keep the camera locked to the player's head/eyes
     m_camera.setPosition(m_position + glm::vec3(0.0f, m_eyeHeight, 0.0f));
+}
+
+void Player::setPosition(const glm::vec3& position) {
+    Entity::setPosition(position);
+    m_camera.setPosition(position + glm::vec3(0.0f, m_eyeHeight, 0.0f));
 }
