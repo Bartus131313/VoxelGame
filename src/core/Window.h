@@ -65,16 +65,6 @@ public:
     void update() const;
 
     /**
-     * @brief Clears the framebuffer's color and depth buffers with a specified RGBA color.
-     *
-     * @param r Red component (0.0 to 1.0).
-     * @param g Green component (0.0 to 1.0).
-     * @param b Blue component (0.0 to 1.0).
-     * @param a Alpha component (0.0 to 1.0).
-     */
-    void clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) const;
-
-    /**
      * @brief Gets the current window width in pixels.
      *
      * @return Current window width.

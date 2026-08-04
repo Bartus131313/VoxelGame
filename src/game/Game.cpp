@@ -58,7 +58,7 @@ void Game::update(const float deltaTime) {
 
 void Game::render() {
     // Clear background using Sky Blue color
-    m_window.clear(0.6f, 0.8f, 1.0f, 1.0f);
+    Renderer::clear(0.5f, 0.8f, 1.0f);
 
     const auto viewMatrix = m_player.getCamera().getViewMatrix();
     const auto projectionMatrix = m_player.getCamera().getProjectionMatrix();
@@ -183,6 +183,9 @@ void Game::cleanup() {
     FontManager::cleanup();
     ShaderManager::cleanup();
     TextureManager::cleanup();
+
+    glDeleteBuffers(1, &m_testVBO);
+    glDeleteVertexArrays(1, &m_testVAO);
 
     std::cout << "[Game] Shutting down application...\n";
 }

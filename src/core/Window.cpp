@@ -115,11 +115,6 @@ bool Window::shouldClose() const {
     return glfwWindowShouldClose(m_handle);
 }
 
-void Window::clear(const float r, const float g, const float b, const float a) const {
-    glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
 void Window::setWindowMode(const WindowMode mode) {
     if (m_mode == mode) return;
 
