@@ -93,7 +93,13 @@ void Window::init() {
 
     // Default clear state
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    // Enable depth test flag for proper depth sorting
     glEnable(GL_DEPTH_TEST);
+
+    // Enable cull face flag to not render back side of the meshes
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 }
 
 void Window::centerWindow() const {

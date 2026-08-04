@@ -5,12 +5,16 @@
 
 #include "../input/Input.h"
 #include "glm/ext/matrix_transform.hpp"
+#include "render/Renderer.h"
 
 Game::Game()
     : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
 {
     // Register this game as listener for all window events
     m_window.addEventListener(this);
+
+    // Initialize global state manager
+    Renderer::init();
 }
 
 void Game::update(const float deltaTime) {
