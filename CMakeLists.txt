@@ -65,6 +65,7 @@ add_executable(${PROJECT_NAME}
         src/core/Logger.h
         src/game/world/World.cpp
         src/game/world/World.h
+        src/game/resource/ResourceLocation.h
 )
 
 # Include Directories for Headers
@@ -86,6 +87,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/assets
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/assets
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
+)
+
+# Copy data folder
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/data
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/data
 )
