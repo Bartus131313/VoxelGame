@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../Vertex.h"
+#include "../../../core/Logger.h"
 
 std::unordered_map<std::string, std::shared_ptr<FontData>> FontManager::m_fonts;
 
@@ -24,14 +25,14 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
     // Read TTF file into memory
     std::ifstream file(fullPath, std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
-        std::cerr << "[FontManager::loadFont] Failed to open font file: " << fullPath << "\n";
+        LOG_ERROR("Failed to open font file: {}", fullPath);
         return nullptr;
     }
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
     std::vector<unsigned char> ttfBuffer(size);
     if (!file.read(reinterpret_cast<char*>(ttfBuffer.data()), size)) {
-        std::cerr << "[FontManager::loadFont] Failed to read font file data: " << fullPath << "\n";
+        LOG_ERROR("Failed to read font file data: {}", fullPath);
         return nullptr;
     }
 
@@ -44,7 +45,7 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
 
     stbtt_fontinfo font;
     if (!stbtt_InitFont(&font, ttfBuffer.data(), 0)) {
-        std::cerr << "[FontManager::loadFont] Failed to initialize stb_truetype font info: " << fullPath << "\n";
+        LOG_ERROR("Failed to initialize stb_truetype font info: {}", fullPath);
         return nullptr;
     }
 
@@ -56,7 +57,7 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
 
     stbtt_pack_context pc;
     if (!stbtt_PackBegin(&pc, pixels.data(), FONT_ATLAS_WIDTH, FONT_ATLAS_HEIGHT, 0, 1, nullptr)) {
-        std::cerr << "[FontManager::loadFont] Failed to initialize stb font packer.\n";
+        LOG_ERROR("Failed to initialize stb font packer.");
         return nullptr;
     }
 
@@ -91,7 +92,7 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
 
     glBindVertexArray(0);
 
-    std::cout << "[FontManager::loadFont] Successfully loaded and packed font: " << fullPath << " (" << fontSize << "px)\n";
+    LOG_DEBUG("Loaded and packed font {} ({} px)", fontFileName, fontSize);
 
     // Cache and return
     m_fonts[cacheKey] = fontData;
@@ -100,5 +101,5 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
 
 void FontManager::cleanup() {
     m_fonts.clear();
-    std::cout << "[FontManager::cleanup] Cleaned up all cached fonts.\n";
+    LOG_INFO("Cleaned up all cached fonts.");
 }

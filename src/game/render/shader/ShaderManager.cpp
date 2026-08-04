@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "../../../core/Logger.h"
+
 // Initialize the static cache map
 std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderManager::m_shaders;
 
@@ -24,7 +26,7 @@ std::shared_ptr<Shader> ShaderManager::loadShader(const std::string& shaderFileN
 
     // We pass the geoPath as well. If it's empty, the Shader class will ignore it.
     if (!shader->loadFromFile(vertPath, fragPath, geoPath)) {
-        std::cerr << "[ShaderManager] Failed to load shader asset: " << shaderFileName << "\n";
+        LOG_ERROR("Failed to load shader asset {}", shaderFileName);
         return nullptr;
     }
 
@@ -35,5 +37,5 @@ std::shared_ptr<Shader> ShaderManager::loadShader(const std::string& shaderFileN
 
 void ShaderManager::cleanup() {
     m_shaders.clear();
-    std::cout << "[ShaderManager] Cleaned up all cached shaders.\n";
+    LOG_INFO("Cleaned up all cached shaders.");
 }

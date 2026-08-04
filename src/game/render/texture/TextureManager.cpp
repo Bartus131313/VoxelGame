@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include "../../../core/Logger.h"
+
 std::unordered_map<std::string, std::shared_ptr<TextureData>> TextureManager::m_textures;
 
 std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& textureFileName, const bool flipVertically) {
@@ -26,7 +28,7 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& text
     unsigned char* pixels = stbi_load(fullPath.c_str(), &width, &height, &channels, 0);
 
     if (!pixels) {
-        std::cerr << "[TextureManager::loadTexture] Failed to load image file: " << fullPath << "\n";
+        LOG_ERROR("Failed to load image file: {}", fullPath);
         return nullptr;
     }
 
@@ -69,8 +71,7 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& text
     // Free CPU image data buffer
     stbi_image_free(pixels);
 
-    std::cout << "[TextureManager::loadTexture] Successfully loaded texture: " << fullPath 
-              << " (" << width << "x" << height << ", " << channels << " channels)\n";
+    LOG_DEBUG("Loaded texture {} ({}x{}, {} channels)", textureFileName, width, height, channels);
 
     // Cache and return
     m_textures[cacheKey] = textureData;
@@ -79,5 +80,5 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& text
 
 void TextureManager::cleanup() {
     m_textures.clear();
-    std::cout << "[TextureManager::cleanup] Cleaned up all cached textures.\n";
+    LOG_INFO("Cleaned up all cached textures.");
 }

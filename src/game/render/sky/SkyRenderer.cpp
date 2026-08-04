@@ -7,6 +7,7 @@
 
 #include "../Renderer.h"
 #include "../../Game.h"
+#include "../../../core/Logger.h"
 #include "../shader/ShaderManager.h"
 
 namespace {
@@ -145,11 +146,11 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
                                        const glm::vec2 uvMin, const glm::vec2 uvMax, const float size,
                                        const float brightness) const {
     if (!m_celestialShader) {
-        std::cout << "[SkyRenderer] renderCelestialBody: skipped, no celestial shader\n";
+        LOG_WARN("Rendering celestial body skipped - no celestial shader.");
         return;
     }
     if (!texture || !texture->isValid()) {
-        std::cout << "[SkyRenderer] renderCelestialBody: skipped, texture missing/invalid\n";
+        LOG_WARN("Rendering celestial body skipped - texture missing/invalid.");
         return;
     }
 
@@ -177,7 +178,6 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
-    if (const GLenum err = glGetError(); err != GL_NO_ERROR) {
-        std::cout << "[SkyRenderer] GL error after celestial draw: 0x" << std::hex << err << std::dec << "\n";
-    }
+    // Check if there was any error while rendering celestial body
+    Renderer::checkError("celestial body rendering");
 }

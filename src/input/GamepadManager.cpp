@@ -1,6 +1,8 @@
 #include "GamepadManager.h"
 #include <iostream>
 
+#include "../core/Logger.h"
+
 void GamepadManager::init() {
     glfwSetJoystickCallback(joystickCallback);
 
@@ -108,9 +110,9 @@ glm::vec2 GamepadManager::applyRadialDeadZone(const float x, const float y, cons
 void GamepadManager::joystickCallback(const int jid, const int event) {
     if (event == GLFW_CONNECTED) {
         if (glfwJoystickIsGamepad(jid)) {
-            std::cout << "[Input] Gamepad connected: " << glfwGetGamepadName(jid) << " (Slot: " << jid << ")\n";
+            LOG_INFO("Gamepad connected: {} (Slot {})", glfwGetGamepadName(jid), jid);
         }
     } else if (event == GLFW_DISCONNECTED) {
-        std::cout << "[Input] Gamepad disconnected (Slot: " << jid << ")\n";
+        LOG_INFO("Gamepad disconnected (Slot {})", jid);
     }
 }

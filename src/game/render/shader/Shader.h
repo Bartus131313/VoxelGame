@@ -29,7 +29,7 @@ public:
      * @param vertexPath Path to the GLSL vertex shader file.
      * @param fragmentPath Path to the GLSL fragment shader file.
      * @param geometryPath Optional path to the GLSL geometry shader file.
-     * @return @c True if compilation and linking succeed, @c false otherwise.
+     * @return @c true if compilation and linking succeed, @c false otherwise.
      */
     bool loadFromFile(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 

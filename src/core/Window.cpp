@@ -3,6 +3,8 @@
 #include <iostream>
 #include <utility>
 
+#include "Logger.h"
+
 Window::Window(const int width, const int height, std::string  title)
     : m_width(width), m_height(height), m_title(std::move(title))
 {
@@ -55,7 +57,7 @@ Window* Window::getWindowInstance(GLFWwindow* handle) {
 void Window::init() {
     // Check if GLFW initializes successfully
     if (!glfwInit()) {
-        std::cerr << "[Window] Failed to initialize GLFW!\n";
+        LOG_ERROR("Failed to initialize GLFW!");
         return;
     }
 
@@ -70,7 +72,7 @@ void Window::init() {
     // Create GLFW window handle
     m_handle = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
     if (!m_handle) {
-        std::cerr << "[Window] Failed to create GLFW window!\n";
+        LOG_ERROR("Failed to create GLFW window!");
         glfwTerminate();
         return;
     }
@@ -79,7 +81,7 @@ void Window::init() {
 
     // Initialize GLAD function pointers
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
-        std::cerr << "[Window] Failed to initialize GLAD!\n";
+        LOG_ERROR("Failed to initialize GLAD!");
         return;
     }
 
@@ -205,7 +207,6 @@ void Window::framebufferSizeCallback(GLFWwindow* windowHandle, const int width, 
 
     window->m_width = width;
     window->m_height = height;
-    glViewport(0, 0, width, height);
 
     // Forward to all registered listeners
     for (auto* listener : window->m_listeners) {

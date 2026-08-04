@@ -52,3 +52,13 @@ void Renderer::setBlending(const bool enable) {
 void Renderer::setBlendFunc(const GLenum sourceFactor, const GLenum destFactor) {
     glBlendFunc(sourceFactor, destFactor);
 }
+
+void Renderer::checkError(std::string_view context, const std::source_location location) {
+    while (GLenum err = glGetError()) {
+        if (context.empty()) {
+            Logger::log(LogLevel::Warn, location, "OpenGL error: 0x{:04X}", err);
+        } else {
+            Logger::log(LogLevel::Warn, location, "OpenGL error after [{}]: 0x{:04X}", context, err);
+        }
+    }
+}

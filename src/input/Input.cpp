@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "../core/Logger.h"
+
 void Input::init(GLFWwindow* window) {
     s_window = window;
     s_keyboard.init(window);
@@ -21,7 +23,7 @@ void Input::update() {
 
 void Input::createAction(const std::string& actionName) {
     if (s_actions.contains(actionName)) {
-        std::cerr << "[Input::createAction] Action already exists: " << actionName << std::endl;
+        LOG_WARN("Action `{}` already exists!", actionName);
         return;
     }
 
@@ -30,7 +32,7 @@ void Input::createAction(const std::string& actionName) {
 
 void Input::bindKey(const std::string& actionName, const int key) {
     if (!s_actions.contains(actionName)) {
-        std::cerr << "[Input::bindKey] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return;
     }
 
@@ -39,7 +41,7 @@ void Input::bindKey(const std::string& actionName, const int key) {
 
 void Input::bindMouseButton(const std::string& actionName, const int button) {
     if (!s_actions.contains(actionName)) {
-        std::cerr << "[Input::bindMouseButton] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return;
     }
 
@@ -48,7 +50,7 @@ void Input::bindMouseButton(const std::string& actionName, const int button) {
 
 void Input::bindGamepadButton(const std::string& actionName, const int gamepadButton) {
     if (!s_actions.contains(actionName)) {
-        std::cerr << "[Input::bindGamepadButton] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return;
     }
 
@@ -57,7 +59,7 @@ void Input::bindGamepadButton(const std::string& actionName, const int gamepadBu
 
 void Input::bindGamepadAxis(const std::string& actionName, const GamepadAxisDir direction, const float threshold) {
     if (!s_actions.contains(actionName)) {
-        std::cerr << "[Input::bindGamepadAxis] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return;
     }
 
@@ -77,7 +79,7 @@ int Input::getConnectedGamepadCount() {
 bool Input::isActionPressed(const std::string& actionName, const int playerIndex) {
     const auto it = s_actions.find(actionName);
     if (it == s_actions.end()) {
-        std::cerr << "[Input::isActionPressed] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return false;
     }
 
@@ -105,7 +107,7 @@ bool Input::isActionPressed(const std::string& actionName, const int playerIndex
 bool Input::isActionJustPressed(const std::string& actionName, const int playerIndex) {
     const auto it = s_actions.find(actionName);
     if (it == s_actions.end()) {
-        std::cerr << "[Input::isActionJustPressed] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return false;
     }
 
@@ -136,7 +138,7 @@ bool Input::isActionJustPressed(const std::string& actionName, const int playerI
 bool Input::isActionJustReleased(const std::string& actionName, const int playerIndex) {
     const auto it = s_actions.find(actionName);
     if (it == s_actions.end()) {
-        std::cerr << "[Input::isActionJustReleased] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return false;
     }
 
@@ -168,7 +170,7 @@ bool Input::isActionJustReleased(const std::string& actionName, const int player
 float Input::getActionStrength(const std::string& actionName, const int playerIndex) {
     const auto it = s_actions.find(actionName);
     if (it == s_actions.end()) {
-        std::cerr << "[Input::getActionStrength] Action does not exist: " << actionName << std::endl;
+        LOG_WARN("Action `{}` does not exist!", actionName);
         return 0.0f;
     }
 

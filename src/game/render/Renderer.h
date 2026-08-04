@@ -1,5 +1,7 @@
 #pragma once
 
+#include <source_location>
+#include <string_view>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -69,4 +71,12 @@ public:
      * @param destFactor Destination blending factor (e.g., GL_ONE_MINUS_SRC_ALPHA).
      */
     static void setBlendFunc(GLenum sourceFactor, GLenum destFactor);
+
+    /**
+     * @brief Checks and logs any pending OpenGL errors.
+     * @param context Optional description of the operation being checked.
+     * @param location Caller source location (auto-filled).
+     */
+    static void checkError(std::string_view context = "",
+                           std::source_location location = std::source_location::current());
 };

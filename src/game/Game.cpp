@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+#include "../core/Logger.h"
 #include "../input/Input.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "render/Renderer.h"
@@ -38,7 +39,7 @@ void Game::update(const float deltaTime) {
     if (Input::isActionJustPressed("toggle_cursor")) {
         const bool currentLocked = Input::getMouse().isCursorLocked();
         Input::getMouse().setCursorLocked(!currentLocked);
-        std::cout << "[Game] Cursor " << (!currentLocked ? "Locked" : "Unlocked") << std::endl;
+        LOG_DEBUG("Cursor {}", !currentLocked ? "Locked" : "Unlocked");
     }
 
     // Update player
@@ -107,8 +108,6 @@ int Game::run() {
     m_lastUpdateTime = currentTime;
     m_lastRenderTime = currentTime;
 
-    std::cout << "[Game] Initialized successfully!\n";
-
     // Add elements to canvas
     m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0");
     m_fpsLabel->setPosition(20, 20);
@@ -139,6 +138,8 @@ int Game::run() {
         "environment/celestial/sun.png",
         "environment/celestial/moon_phases.png"
         );
+
+    LOG_INFO("Game initialized.");
 
     // Main game loop
     while (!m_window.shouldClose()) {
@@ -190,5 +191,5 @@ void Game::cleanup() {
     glDeleteBuffers(1, &m_testVBO);
     glDeleteVertexArrays(1, &m_testVAO);
 
-    std::cout << "[Game] Shutting down application...\n";
+    LOG_INFO("Shutting down application...");
 }

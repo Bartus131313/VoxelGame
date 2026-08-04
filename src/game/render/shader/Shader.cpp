@@ -5,6 +5,8 @@
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../../../core/Logger.h"
+
 Shader::~Shader() {
     if (m_programID != 0) glDeleteProgram(m_programID);
 }
@@ -37,7 +39,7 @@ bool Shader::loadFromFile(const std::string& vertexPath, const std::string& frag
         }
     }
     catch (const std::ifstream::failure& e) {
-        std::cerr << "[Shader] ERROR: Failed to read shader files from disk.\n";
+        LOG_ERROR("Failed to read shader files from disk!");
         return false;
     }
 
@@ -86,7 +88,7 @@ bool Shader::loadFromFile(const std::string& vertexPath, const std::string& frag
         return false;
     }
 
-    std::cout << "[Shader] Successfully compiled and linked: " << vertexPath << "\n";
+    LOG_DEBUG("Compiled and linked shader [ID: {}]", vertex);
     return true;
 }
 
@@ -94,15 +96,15 @@ void Shader::use() const {
     glUseProgram(m_programID);
 }
 
-void Shader::setBool(const std::string& name, bool value) const {
+void Shader::setBool(const std::string& name, const bool value) const {
     glUniform1i(glGetUniformLocation(m_programID, name.c_str()), static_cast<int>(value));
 }
 
-void Shader::setInt(const std::string& name, int value) const {
+void Shader::setInt(const std::string& name, const int value) const {
     glUniform1i(glGetUniformLocation(m_programID, name.c_str()), value);
 }
 
-void Shader::setFloat(const std::string& name, float value) const {
+void Shader::setFloat(const std::string& name, const float value) const {
     glUniform1f(glGetUniformLocation(m_programID, name.c_str()), value);
 }
 
@@ -132,20 +134,28 @@ bool Shader::checkCompileErrors(const GLuint shader, const ShaderCompilationType
     GLint success;
     GLchar infoLog[1024];
 
-    if (type != Program) {
+    // Helper lambda to convert enum type to a readable label
+    auto getTypeString = [](const ShaderCompilationType t) -> const char* {
+        switch (t) {
+            case Vertex:    return "VERTEX";
+            case Fragment:  return "FRAGMENT";
+            case Geometry:  return "GEOMETRY";
+            default:        return "UNKNOWN";
+        }
+    };
+
+    if (type != ShaderCompilationType::Program) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
-            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "[Shader] ERROR: SHADER COMPILATION ERROR (" << type << ")\n"
-                      << infoLog << "\n-------------------------------------------------\n";
+            glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
+            LOG_ERROR("Shader compilation failed [{}]\n{}", getTypeString(type), infoLog);
             return false;
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
-            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "[Shader] ERROR: PROGRAM LINKING ERROR\n"
-                      << infoLog << "\n-------------------------------------------------\n";
+            glGetProgramInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
+            LOG_ERROR("Shader program linking failed\n{}", infoLog);
             return false;
         }
     }

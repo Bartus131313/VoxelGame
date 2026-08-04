@@ -61,6 +61,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/Renderer.h
         src/game/entity/Entity.cpp
         src/game/entity/Entity.h
+        src/core/Logger.cpp
+        src/core/Logger.h
 )
 
 # Include Directories for Headers

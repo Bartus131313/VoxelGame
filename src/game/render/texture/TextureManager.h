@@ -32,7 +32,7 @@ struct TextureData {
     /**
      * @brief Checks if texture was successfully loaded and can be used.
      *
-     * @return @c True if texture is valid, @c false if not.
+     * @return @c true if texture is valid, @c false if not.
      */
     [[nodiscard]] bool isValid() const { return id != 0; }
 };
