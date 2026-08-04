@@ -48,6 +48,7 @@ add_executable(${PROJECT_NAME}
         src/game/entity/Player.cpp
         src/game/entity/Player.h
         src/core/IWindowEventListener.h
+        src/game/render/mesh/Mesh.h
 )
 
 # Include Directories for Headers
