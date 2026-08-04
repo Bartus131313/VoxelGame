@@ -4,6 +4,7 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "../../resource/ResourceLocation.h"
 #include "../mesh/impl/SkyboxMesh.h"
 #include "../texture/TextureManager.h"
 #include "../shader/ShaderManager.h"
@@ -23,10 +24,10 @@ public:
     /**
      * @brief Loads shaders and textures required by the sky renderer.
      *
-     * @param sunTexturePath Path (relative to @c TextureManager::TEXTURES_PATH) to the sun texture.
-     * @param moonAtlasPath Path (relative to @c TextureManager::TEXTURES_PATH) to the moon phase atlas.
+     * @param sunResource Resource Location pointing to sun texture file.
+     * @param moonAtlasResource Resource Location pointing to moon atlas texture file.
      */
-    void init(const std::string& sunTexturePath, const std::string& moonAtlasPath);
+    void init(const ResourceLocation& sunResource, const ResourceLocation& moonAtlasResource);
 
     /**
      * @brief Advances the sky state to the given absolute game tick.
@@ -52,6 +53,9 @@ public:
     [[nodiscard]] float getDaylightFactor() const { return m_daylightFactor; }
 
 private:
+    const ResourceLocation skyDomeShaderLocation{"shaders/environment/sky_dome"};
+    const ResourceLocation celestialShaderLocation{"shaders/environment/celestial"};
+
     /**
      * @brief Renders only procedural sky dome (gradient with stars at night).
      *

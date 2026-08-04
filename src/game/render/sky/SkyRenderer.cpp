@@ -24,14 +24,14 @@ namespace {
     };
 }
 
-void SkyRenderer::init(const std::string& sunTexturePath, const std::string& moonAtlasPath) {
+void SkyRenderer::init(const ResourceLocation& sunResource, const ResourceLocation& moonAtlasResource) {
     // Load all shaders first
-    m_domeShader = ShaderManager::loadShader("environment/sky_dome");
-    m_celestialShader = ShaderManager::loadShader("environment/celestial");
+    m_domeShader = ShaderManager::loadShader(skyDomeShaderLocation);
+    m_celestialShader = ShaderManager::loadShader(celestialShaderLocation);
 
     // Then load all textures
-    m_sunTexture = TextureManager::loadTexture(sunTexturePath, false);
-    m_moonAtlas = TextureManager::loadTexture(moonAtlasPath, false);
+    m_sunTexture = TextureManager::loadTexture(sunResource, false);
+    m_moonAtlas = TextureManager::loadTexture(moonAtlasResource, false);
 
     // Generate VAO and VBO
     glGenVertexArrays(1, &m_celestialVAO);

@@ -5,21 +5,21 @@
 #include "../../../core/Logger.h"
 
 // Initialize the static cache map
-std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderManager::m_shaders;
+std::unordered_map<ShaderKey, std::shared_ptr<Shader>> ShaderManager::m_shaders;
 
-std::shared_ptr<Shader> ShaderManager::loadShader(const std::string& shaderFileName, const bool useGeometry) {
-    // Create a safe, unique cache key (e.g., "ui_shader_std" or "terrain_shader_geo")
-    const std::string cacheKey = shaderFileName + (useGeometry ? "_geo" : "_std");
+std::shared_ptr<Shader> ShaderManager::loadShader(const ResourceLocation& shaderLocation, const bool useGeometry) {
+    // Create the stack-allocated lookup key
+    const ShaderKey cacheKey{shaderLocation, useGeometry};
 
-    // Check if the shader already exists in the cache
-    if (const auto it = m_shaders.find(cacheKey); it != m_shaders.end()) {
-        return it->second;
-    }
+    // Check if the shader is already compiled and cached
+    if (m_shaders.contains(cacheKey)) return m_shaders[cacheKey];
+
+    const std::string shaderFileName = shaderLocation.resolveAssetPath();
 
     // Build full file paths
-    const std::string vertPath = std::string(SHADERS_PATH) + shaderFileName + ".vsh";
-    const std::string fragPath = std::string(SHADERS_PATH) + shaderFileName + ".fsh";
-    const std::string geoPath  = useGeometry ? (std::string(SHADERS_PATH) + shaderFileName + ".gsh") : "";
+    const std::string vertPath = shaderFileName + ".vsh";
+    const std::string fragPath = shaderFileName + ".fsh";
+    const std::string geoPath  = useGeometry ? (shaderFileName + ".gsh") : "";
 
     // Allocate the shader and delegate the heavy lifting to it
     auto shader = std::make_shared<Shader>();

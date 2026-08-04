@@ -6,19 +6,17 @@
 
 #include "../../../core/Logger.h"
 
-std::unordered_map<std::string, std::shared_ptr<TextureData>> TextureManager::m_textures;
+std::unordered_map<TextureKey, std::shared_ptr<TextureData>> TextureManager::m_textures;
 
-std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& textureFileName, const bool flipVertically) {
-    // Create a safe, unique cache key (e.g., "dirt.png-flipped")
-    const std::string cacheKey = textureFileName + (flipVertically ? "-flipped" : "-raw");
+std::shared_ptr<TextureData> TextureManager::loadTexture(const ResourceLocation& textureLocation, const bool flipVertically) {
+    // Create the stack-allocated lookup key
+    const TextureKey cacheKey{textureLocation, flipVertically};
 
-    // Check if texture already exists in cache
-    if (const auto it = m_textures.find(cacheKey); it != m_textures.end()) {
-        return it->second;
-    }
+    // Check if the texture is already loaded with these exact settings
+    if (m_textures.contains(cacheKey)) return m_textures[cacheKey];
 
-    // Build full path
-    const std::string fullPath = std::string(TEXTURES_PATH) + textureFileName;
+    // Resolve the path
+    std::string fullPath = textureLocation.resolveAssetPath();
 
     // Configure stb_image vertical flip for OpenGL coordinate origin
     stbi_set_flip_vertically_on_load(flipVertically ? 1 : 0);
@@ -71,7 +69,7 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const std::string& text
     // Free CPU image data buffer
     stbi_image_free(pixels);
 
-    LOG_DEBUG("Loaded texture {} ({}x{}, {} channels)", textureFileName, width, height, channels);
+    LOG_DEBUG("Loaded texture {} ({}x{}, {} channels)", fullPath, width, height, channels);
 
     // Cache and return
     m_textures[cacheKey] = textureData;

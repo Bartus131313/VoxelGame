@@ -69,6 +69,9 @@ public:
     [[nodiscard]] Player* getLocalPlayer() const { return m_localPlayer; }
 
 private:
+    const ResourceLocation sunTextureLocation{"textures/environment/celestial/sun.png"};
+    const ResourceLocation moonAtlasLocation{"textures/environment/celestial/moon_phases.png"};
+
     /** @brief Executes fixed game ticks (physics, logic, world simulation). */
     void tick();
 

@@ -20,8 +20,8 @@ public:
      */
     UILabel(const std::string& fontFilePath, const int fontSize, std::string text,
         const glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f})
-        : m_fontData(FontManager::loadFont(fontFilePath, fontSize)), m_text(std::move(text)), m_color(color) {
-        m_shader = ShaderManager::loadShader("font");
+        : m_fontData(FontManager::loadFont({fontFilePath}, fontSize)), m_text(std::move(text)), m_color(color) {
+        m_shader = ShaderManager::loadShader(fontShaderLocation);
     }
 
     /**
@@ -55,6 +55,8 @@ public:
     }
 
 private:
+    const ResourceLocation fontShaderLocation{"shaders/font"};
+
     std::shared_ptr<Shader> m_shader;       ///< Shader program used for rendering text.
     std::shared_ptr<FontData> m_fontData;   ///< Shared pointer to cached font atlas metadata used for rendering.
     std::string m_text;                     ///< Current string content to display.

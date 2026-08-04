@@ -102,7 +102,7 @@ int Game::run() {
     m_lastRenderTime = currentTime;
 
     // Add elements to canvas
-    m_fpsLabel = m_canvas.addElement<UILabel>("ProximaNova.ttf", 24, "FPS: 0");
+    m_fpsLabel = m_canvas.addElement<UILabel>("fonts/ProximaNova.ttf", 24, "FPS: 0");
     m_fpsLabel->setPosition(20, 20);
     m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
 

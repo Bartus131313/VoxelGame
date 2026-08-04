@@ -8,19 +8,17 @@
 #include "../Vertex.h"
 #include "../../../core/Logger.h"
 
-std::unordered_map<std::string, std::shared_ptr<FontData>> FontManager::m_fonts;
+std::unordered_map<FontKey, std::shared_ptr<FontData>> FontManager::m_fonts;
 
-std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName, const int fontSize) {
-    // Create a safe, unique cache key (e.g., "arial.ttf-32")
-    const std::string cacheKey = fontFileName + "-" + std::to_string(fontSize);
+std::shared_ptr<FontData> FontManager::loadFont(const ResourceLocation& fontLocation, const int fontSize) {
+    // Create the lookup key
+    const FontKey cacheKey{fontLocation, fontSize};
 
-    // Check if font already exists in cache
-    if (const auto it = m_fonts.find(cacheKey); it != m_fonts.end()) {
-        return it->second;
-    }
+    // Check if it already exists in the cache
+    if (m_fonts.contains(cacheKey)) return m_fonts[cacheKey];
 
-    // Build full path
-    const std::string fullPath = std::string(FONTS_PATH) + fontFileName;
+    // Resolve the path and load the font if not found
+    std::string fullPath = fontLocation.resolveAssetPath();
 
     // Read TTF file into memory
     std::ifstream file(fullPath, std::ios::binary | std::ios::ate);
@@ -92,7 +90,7 @@ std::shared_ptr<FontData> FontManager::loadFont(const std::string& fontFileName,
 
     glBindVertexArray(0);
 
-    LOG_DEBUG("Loaded and packed font {} ({} px)", fontFileName, fontSize);
+    LOG_DEBUG("Loaded and packed font {} ({} px)", fullPath, fontSize);
 
     // Cache and return
     m_fonts[cacheKey] = fontData;

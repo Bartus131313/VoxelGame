@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "../../resource/ResourceLocation.h"
 #include "glad/glad.h"
 
 /** @brief Represents data of a loaded 2D texture, featuring automated VRAM cleanup via RAII. */
@@ -37,25 +38,43 @@ struct TextureData {
     [[nodiscard]] bool isValid() const { return id != 0; }
 };
 
+/** @brief TextureKey struct is used to be as a key pointing to cached TextureData. */
+struct TextureKey {
+    ResourceLocation location;
+    bool flipVertically{true};
+
+    bool operator==(const TextureKey& other) const {
+        return location == other.location && flipVertically == other.flipVertically;
+    }
+};
+
+template <>
+struct std::hash<TextureKey> {
+    std::size_t operator()(const TextureKey& key) const noexcept {
+        const std::size_t h1 = key.location.getHashCode();
+        const std::size_t h2 = std::hash<bool>{}(key.flipVertically);
+
+        return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+    }
+};
+
 /** @brief Handles 2D texture loading, unloading and caching. */
 class TextureManager {
 public:
-    static constexpr auto TEXTURES_PATH = "assets/textures/"; ///< Default base directory for texture assets.
-
     /**
      * @brief Loads a new texture into memory or returns the cached version if it already exists.
      *
-     * @param textureFileName File name of the texture relative to @c TEXTURES_PATH folder.
+     * @param textureLocation Resource Location pointing to the texture file.
      * @param flipVertically Whether to flip the image vertically on load (defaults to true for OpenGL UV space).
      * 
      * @return Shared pointer to TextureData, or nullptr if loading failed.
      */
-    static std::shared_ptr<TextureData> loadTexture(const std::string& textureFileName, bool flipVertically = true);
+    static std::shared_ptr<TextureData> loadTexture(const ResourceLocation &textureLocation, bool flipVertically = true);
 
     /** @brief Clears the texture cache, automatically invoking RAII cleanup on all loaded texture resources. */
     static void cleanup();
 
 private:
     /** @brief Internal cache storing shared pointers to loaded texture data mapped by a unique identifier key. */
-    static std::unordered_map<std::string, std::shared_ptr<TextureData>> m_textures;
+    static std::unordered_map<TextureKey, std::shared_ptr<TextureData>> m_textures;
 };

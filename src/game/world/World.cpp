@@ -6,10 +6,7 @@
 
 World::World() {
     // Initialize sky renderer
-    m_skyRenderer.init(
-        "environment/celestial/sun.png",
-        "environment/celestial/moon_phases.png"
-        );
+    m_skyRenderer.init(sunTextureLocation, moonAtlasLocation);
 
     // Spawn local player
     m_localPlayer = spawnEntity<Player>();
