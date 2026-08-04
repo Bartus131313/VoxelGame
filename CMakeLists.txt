@@ -73,6 +73,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glm
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nlohmann
 )
 
 # Link Libraries
