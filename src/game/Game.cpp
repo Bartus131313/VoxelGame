@@ -43,18 +43,35 @@ void Game::update(const float deltaTime) {
 
     // Update player
     m_player.update(deltaTime);
+
+    // Advance the game clock. Accumulated as float ticks then truncated so partial-tick
+    // drift doesn't get lost across frames of varying deltaTime.
+    m_tickAccumulator += deltaTime * TICKS_PER_SECOND;
+    while (m_tickAccumulator >= 1.0f) {
+        m_gameTicks++;
+        m_tickAccumulator -= 1.0f;
+    }
+
+    // Update sky renderer with game ticks
+    m_skyRenderer.update(m_gameTicks);
 }
 
 void Game::render() {
     // Clear background using Sky Blue color
     m_window.clear(0.6f, 0.8f, 1.0f, 1.0f);
 
+    const auto viewMatrix = m_player.getCamera().getViewMatrix();
+    const auto projectionMatrix = m_player.getCamera().getProjectionMatrix();
+
+    // Render procedural sky
+    m_skyRenderer.render(viewMatrix, projectionMatrix);
+
     // Render test triangle
     if (m_testShader) {
         m_testShader->use();
         m_testShader->setMat4("model", m_testModelMatrix);
-        m_testShader->setMat4("view", m_player.getCamera().getViewMatrix());
-        m_testShader->setMat4("projection", m_player.getCamera().getProjectionMatrix());
+        m_testShader->setMat4("view", viewMatrix);
+        m_testShader->setMat4("projection", projectionMatrix);
 
         glBindVertexArray(m_testVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -113,6 +130,12 @@ int Game::run() {
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
     glEnableVertexAttribArray(0);
+
+    // Setup procedural sky
+    m_skyRenderer.init(
+        "environment/celestial/sun.png",
+        "environment/celestial/moon_phases.png"
+        );
 
     // Main game loop
     while (!m_window.shouldClose()) {

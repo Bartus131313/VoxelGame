@@ -2,8 +2,8 @@
 
 #include "../core/Window.h"
 #include "entity/Player.h"
-#include "render/camera/Camera3D.h"
-#include "render/font/FontRenderer.h"
+#include "render/mesh/impl/SkyboxMesh.h"
+#include "render/sky/SkyRenderer.h"
 #include "ui/Canvas.h"
 #include "ui/elements/UILabel.h"
 
@@ -16,6 +16,8 @@ public:
     static constexpr auto WINDOW_TITLE  = "Voxel Game"; ///< Title displayed in the window header.
     static constexpr int  WINDOW_WIDTH  = 1280;         ///< Initial rendering width in pixels.
     static constexpr int  WINDOW_HEIGHT = 720;          ///< Initial rendering height in pixels.
+
+    static constexpr float TICKS_PER_SECOND = 20.0f;    ///< How many ticks are in 1 second?
 
     /** @brief Constructs the Game application instance. */
     Game();
@@ -78,9 +80,13 @@ private:
     GLuint m_testVAO{}, m_testVBO{};                    ///< Test VAO and VBO used to draw the triangle.
     glm::mat4 m_testModelMatrix = glm::mat4(1.0f);    ///< Test model matrix for the triangle.
 
-    double m_lastUpdateTime{};    ///< Last time when game was updated.
-    double m_lastRenderTime{};    ///< Last time when game was rendered.
-    int m_renderedFrames{};       ///< Count of frames that were rendered since last FPS update.
+    SkyRenderer m_skyRenderer{};    ///< Test procedural sky.
+    std::int64_t m_gameTicks{0};    ///< Absolute game tick counter.
+    float m_tickAccumulator{};      ///< Fractional-tick carryover between frames.
+
+    double m_lastUpdateTime{};      ///< Last time when game was updated.
+    double m_lastRenderTime{};      ///< Last time when game was rendered.
+    int m_renderedFrames{};         ///< Count of frames that were rendered since last FPS update.
 
     int m_fps{};          ///< Frames per second calculated every second on update pass.
 };

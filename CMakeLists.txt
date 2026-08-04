@@ -51,8 +51,12 @@ add_executable(${PROJECT_NAME}
         src/game/render/mesh/Mesh.h
         src/game/render/mesh/impl/StaticMesh.cpp
         src/game/render/mesh/impl/StaticMesh.h
+        src/game/render/mesh/impl/SkyboxMesh.cpp
+        src/game/render/mesh/impl/SkyboxMesh.h
         src/game/render/texture/TextureManager.cpp
         src/game/render/texture/TextureManager.h
+        src/game/render/sky/SkyRenderer.cpp
+        src/game/render/sky/SkyRenderer.h
         src/game/render/Renderer.cpp
         src/game/render/Renderer.h
 )
