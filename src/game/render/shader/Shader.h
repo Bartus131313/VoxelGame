@@ -105,6 +105,17 @@ public:
      * @param mat Mat4 value which will be set.
      */
     void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+    /**
+     * @brief Binds a texture handle to an OpenGL texture slot and updates the sampler uniform in the shader.
+     *
+     * @param name Name of sampler uniform in shader (e.g., "u_Texture").
+     * @param textureID OpenGL texture handle to bind.
+     * @param slot Texture unit index (0 for GL_TEXTURE0, 1 for GL_TEXTURE1, etc.).
+     * @param target Texture target type (defaults to GL_TEXTURE_2D, can also be GL_TEXTURE_CUBE_MAP, etc.).
+     */
+    void setTexture(const std::string& name, GLuint textureID, unsigned int slot = 0, GLenum target = GL_TEXTURE_2D) const;
+
 private:
     GLuint m_programID = 0; ///< OpenGL shader program ID.
 

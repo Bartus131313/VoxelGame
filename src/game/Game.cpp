@@ -6,6 +6,7 @@
 #include "../input/Input.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "render/Renderer.h"
+#include "render/texture/TextureManager.h"
 
 Game::Game()
     : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -155,7 +156,10 @@ void Game::setupInputBindings() {
 }
 
 void Game::cleanup() {
+    // Free resources from all managers
     FontManager::cleanup();
     ShaderManager::cleanup();
+    TextureManager::cleanup();
+
     std::cout << "[Game] Shutting down application...\n";
 }

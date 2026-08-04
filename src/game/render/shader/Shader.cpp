@@ -122,6 +122,12 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
     glUniformMatrix4fv(glGetUniformLocation(m_programID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
+void Shader::setTexture(const std::string& name, const GLuint textureID, const unsigned int slot, const GLenum target) const {
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(target, textureID);
+    setInt(name, static_cast<int>(slot));
+}
+
 bool Shader::checkCompileErrors(const GLuint shader, const ShaderCompilationType type) {
     GLint success;
     GLchar infoLog[1024];
