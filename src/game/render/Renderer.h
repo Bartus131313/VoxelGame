@@ -40,4 +40,33 @@ public:
      * @param height New framebuffer height in pixels.
      */
     static void setViewport(int width, int height);
+
+    /**
+     * @brief Sets the depth comparison function.
+     *
+     * @param func Depth function (e.g., GL_LESS, GL_LEQUAL).
+     */
+    static void setDepthFunc(GLenum func);
+
+    /**
+     * @brief Enables or disables face culling.
+     *
+     * @param enable True to cull back faces, false to render both sides.
+     */
+    static void setFaceCulling(bool enable);
+
+    /**
+     * @brief Enables or disables alpha blending.
+     *
+     * @param enable True to enable blending, false to disable.
+     */
+    static void setBlending(bool enable);
+
+    /**
+     * @brief Sets the alpha blending function factors.
+     *
+     * @param sourceFactor Source blending factor (e.g., GL_SRC_ALPHA).
+     * @param destFactor Destination blending factor (e.g., GL_ONE_MINUS_SRC_ALPHA).
+     */
+    static void setBlendFunc(GLenum sourceFactor, GLenum destFactor);
 };

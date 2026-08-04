@@ -3,6 +3,7 @@
 #include <vector>
 #include <glad/glad.h>
 
+#include "../Renderer.h"
 #include "../Vertex.h"
 
 void FontRenderer::renderText(const Shader* shader, const FontData* fontData, const std::string& text,
@@ -10,8 +11,8 @@ void FontRenderer::renderText(const Shader* shader, const FontData* fontData, co
     if (!fontData || text.empty()) return;
 
     // Enable Blending for font transparency
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    Renderer::setBlending(true);
+    Renderer::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Bind Shader and Set Uniforms
     shader->setVec4("textColor", color);
@@ -22,7 +23,7 @@ void FontRenderer::renderText(const Shader* shader, const FontData* fontData, co
     glBindTexture(GL_TEXTURE_2D, fontData->textureID);
 
     // Setup initial layout coordinates with top-left anchor shift
-    float currX = static_cast<float>(x);
+    auto currX = static_cast<float>(x);
     float currY = static_cast<float>(y) + (fontData->pixelAscent * scale);
 
     std::vector<Vertex2D> vertices;

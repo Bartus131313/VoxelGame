@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "../../core/Logger.h"
+
 void Renderer::init() {
     // Enable depth buffer testing for correct 3D spatial sorting
     glEnable(GL_DEPTH_TEST);
@@ -16,7 +18,7 @@ void Renderer::init() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    std::cout << "[Renderer] Initialized global OpenGL states.\n";
+    LOG_INFO("Initialized global OpenGL states.");
 }
 
 void Renderer::clear(const glm::vec3& color) {
@@ -31,4 +33,22 @@ void Renderer::clear(const float r, const float g, const float b) {
 
 void Renderer::setViewport(const int width, const int height) {
     glViewport(0, 0, width, height);
+}
+
+void Renderer::setDepthFunc(const GLenum func) {
+    glDepthFunc(func);
+}
+
+void Renderer::setFaceCulling(const bool enable) {
+    if (enable) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+}
+
+void Renderer::setBlending(const bool enable) {
+    if (enable) glEnable(GL_BLEND);
+    else glDisable(GL_BLEND);
+}
+
+void Renderer::setBlendFunc(const GLenum sourceFactor, const GLenum destFactor) {
+    glBlendFunc(sourceFactor, destFactor);
 }

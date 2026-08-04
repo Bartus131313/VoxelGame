@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/constants.hpp>
 
+#include "../Renderer.h"
 #include "../../Game.h"
 #include "../shader/ShaderManager.h"
 
@@ -75,19 +76,11 @@ void SkyRenderer::update(const std::int64_t ticks) {
 }
 
 void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) const {
-    //
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
+    // Setup state for sky rendering
+    Renderer::setDepthFunc(GL_LEQUAL);
+    Renderer::setFaceCulling(false);
 
     renderSkyDome(view, projection);
-
-    // SkyboxMesh::render() (used by renderSkyDome via m_domeMesh) resets glDepthFunc back to
-    // GL_LESS and re-enables face culling internally when it finishes. Without re-asserting
-    // GL_LEQUAL + no-cull here, the sun/moon quads below — which are also pushed to depth 1.0 —
-    // fail the depth test against the dome's already-written depth of 1.0 (1.0 is not "less than"
-    // 1.0) and get silently discarded, even though the draw call itself succeeds with no GL error.
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
 
     // Compute sun/moon directions from the current day progress.
     // sunAngle = 0 -> dawn (sun on eastern horizon), pi/2 -> noon (zenith), pi -> dusk, 3pi/2 -> midnight (nadir).
@@ -95,8 +88,9 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     const glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, std::sin(sunAngle), -std::cos(sunAngle)));
     const glm::vec3 moonDir = -sunDir; // Moon is always opposite the sun
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standard alpha blend using the texture's real alpha channel
+    // Setup state for celestial bodies
+    Renderer::setBlending(true);
+    Renderer::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Sun: full-size atlas (no phases), full brightness, only really visible while above horizon
     const float sunBrightness = glm::clamp(sunDir.y * 4.0f + 0.2f, 0.0f, 1.0f);
@@ -112,7 +106,7 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     const glm::vec2 moonUvMax((col + 1) / 4.0f, (row + 1) / 2.0f);
 
     // Moon is always opposite the sun, which is the same as being half a rotation further along
-    // the same arc — so its orientation angle is simply sunAngle + pi.
+    // the same arc - so its orientation angle is simply sunAngle + pi.
     const float moonAngle = sunAngle + glm::pi<float>();
 
     const float moonBrightness = glm::clamp(moonDir.y * 4.0f + 0.2f, 0.0f, 1.0f) * 0.6f;
@@ -120,10 +114,10 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
         renderCelestialBody(view, projection, moonDir, moonAngle, m_moonAtlas, moonUvMin, moonUvMax, 48.0f, moonBrightness);
     }
 
-    glDisable(GL_BLEND);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-
+    // Restore default 3D pipeline states
+    Renderer::setBlending(false);
+    Renderer::setDepthFunc(GL_LESS);
+    Renderer::setFaceCulling(true);
 }
 
 void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projection) const {
@@ -138,14 +132,8 @@ void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projecti
     m_domeShader->setFloat("daylightFactor", m_daylightFactor);
     m_domeShader->setVec3("sunDirection", sunDir);
     m_domeShader->setFloat("time", m_elapsedSeconds);
-
-    // Tweak these palettes to taste; they roughly follow Minecraft's day/night sky colors.
     m_domeShader->setVec3("zenithDayColor", glm::vec3(0.30f, 0.55f, 0.95f));
     m_domeShader->setVec3("horizonDayColor", glm::vec3(0.70f, 0.82f, 0.95f));
-    // Minecraft's night sky is essentially pure black, just barely lifted so the stars have
-    // something to sit against without banding.
-    // Minecraft's night sky is very dark, but not pure black — a faint dark-navy tint gives
-    // the moon and stars something to actually contrast against instead of vanishing into void.
     m_domeShader->setVec3("zenithNightColor", glm::vec3(0.02f, 0.025f, 0.06f));
     m_domeShader->setVec3("horizonNightColor", glm::vec3(0.05f, 0.055f, 0.10f));
 
@@ -168,16 +156,9 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     constexpr float distance = 100.0f; // Arbitrary, just needs to sit inside the far plane
     const glm::vec3 worldPos = direction * distance;
 
-    // Orient the quad as if it were rigidly bolted to a wheel rotating about the fixed world
-    // X axis (the axis perpendicular to the sun/moon's arc), the same way Minecraft does it,
-    // rather than deriving right/up per-frame from the direction vector via cross products.
-    // A "look-at" billboard built from cross products is mathematically guaranteed to rotate
-    // 180 degrees in-plane as direction sweeps from dawn to dusk (a straight-line reversal),
-    // and that rotation's midpoint lands right at the zenith — which is exactly the flip that
-    // was visible before. A rigid single-axis rotation has no such singularity: right stays
-    // fixed (it lies along the rotation axis) and up rotates smoothly and continuously with
-    // angle, so the sprite never appears to flip or spin, at the top of the arc or anywhere else.
-    const glm::vec3 right(1.0f, 0.0f, 0.0f);
+    // Rigid single-axis rotation around the world X-axis (Minecraft style).
+    // Prevents the 180-degree flip/singularity at the zenith caused by cross-product billboarding.
+    constexpr glm::vec3 right(1.0f, 0.0f, 0.0f);
     const glm::vec3 up(0.0f, std::cos(angle), std::sin(angle));
 
     m_celestialShader->use();

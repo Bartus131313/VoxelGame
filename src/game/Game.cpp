@@ -82,6 +82,9 @@ void Game::render() {
 }
 
 void Game::onWindowResize(const int width, const int height) {
+    // Change viewport using Renderer
+    Renderer::setViewport(width, height);
+
     // Set the canvas size to the current one
     m_canvas.setSize(width, height);
 

@@ -1,5 +1,7 @@
 #include "SkyboxMesh.h"
 
+#include "../../Renderer.h"
+
 SkyboxMesh::SkyboxMesh() {
     setupBuffers();
 }
@@ -93,19 +95,13 @@ void SkyboxMesh::unbind() const {
 void SkyboxMesh::render() const {
     if (m_vao == 0) return;
 
-    glDisable(GL_CULL_FACE);
-
-    // Change depth function so skybox passes depth test at maximum depth (z = 1.0)
-    glDepthFunc(GL_LEQUAL);
+    Renderer::setFaceCulling(false);
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
-    // Reset depth function to default
-    glDepthFunc(GL_LESS);
-
-    glEnable(GL_CULL_FACE);
+    Renderer::setFaceCulling(true);
 }
 
 void SkyboxMesh::cleanup() {
