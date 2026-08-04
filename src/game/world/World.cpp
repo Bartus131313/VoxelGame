@@ -2,6 +2,7 @@
 
 #include <ranges>
 
+#include "../Game.h"
 #include "../../core/Logger.h"
 
 World::World() {
@@ -20,7 +21,7 @@ World::~World() {
 
 void World::update(const float deltaTime) {
     // Fixed-timestep tick loop
-    m_tickAccumulator += deltaTime * TICKS_PER_SECOND;
+    m_tickAccumulator += deltaTime * Game::TICKS_PER_SECOND;
     while (m_tickAccumulator >= 1.0f) {
         tick();
         m_tickAccumulator -= 1.0f;

@@ -157,7 +157,7 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     constexpr float distance = 100.0f; // Arbitrary, just needs to sit inside the far plane
     const glm::vec3 worldPos = direction * distance;
 
-    // Rigid single-axis rotation around the world X-axis (Minecraft style).
+    // Rigid single-axis rotation around the world X-axis.
     // Prevents the 180-degree flip/singularity at the zenith caused by cross-product billboarding.
     constexpr glm::vec3 right(1.0f, 0.0f, 0.0f);
     const glm::vec3 up(0.0f, std::cos(angle), std::sin(angle));

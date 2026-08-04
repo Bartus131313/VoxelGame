@@ -9,7 +9,7 @@
 
 /**
  * @brief Manages a collection of UI elements, handles Z-index sorting, and renders them
- * using a responsive, Minecraft-style scaled orthographic projection.
+ * using a responsive, scaled orthographic projection.
  */
 class Canvas {
 public:

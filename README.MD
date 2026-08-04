@@ -59,11 +59,11 @@ management via RAII, runtime font atlas generation using `stb_truetype`, and an 
 ### Clone & Build
 ```shell
 # 1. Clone the repository
-git clone https://github.com/Bartus131313/VoxelGame.git
+git clone --recurse-submodules https://github.com/Bartus131313/VoxelGame.git
 cd VoxelGame
 
 # 2. Generate build system files
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake -B build -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
 
 # 3. Build executable
 cmake --build build --parallel

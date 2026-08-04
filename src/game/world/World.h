@@ -81,8 +81,6 @@ private:
     Player* m_localPlayer = nullptr;    ///< Non-owning raw pointer targeting the local player in m_entities.
     SkyRenderer m_skyRenderer{};        ///< Procedural sky environment.
 
-    int64_t m_worldTicks{0};            ///< Total game ticks executed (fixed 20 Hz tick rate).
+    int64_t m_worldTicks{0};            ///< Total game ticks executed.
     float m_tickAccumulator{0.0f};      ///< Accumulated time for fixed timestep updates.
-
-    static constexpr float TICKS_PER_SECOND = 20.0f; ///< How many ticks are in one second?
 };

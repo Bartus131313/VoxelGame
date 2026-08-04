@@ -15,7 +15,7 @@ void main() {
 
     float alpha = texColor.a * brightness;
 
-//    if (alpha < 0.02) discard;
+    if (alpha < 0.02) discard;
 
     FragColor = vec4(texColor.rgb, alpha);
 }

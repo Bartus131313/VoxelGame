@@ -4,13 +4,13 @@ out vec4 FragColor;
 
 in vec3 Direction;
 
-uniform vec3 zenithDayColor;
-uniform vec3 horizonDayColor;
-uniform vec3 zenithNightColor;
-uniform vec3 horizonNightColor;
-uniform float daylightFactor; // 0 = full night, 1 = full day
-uniform vec3 sunDirection;    // Normalized world-space direction toward the sun
-uniform float time;           // Seconds elapsed, used to gently twinkle the stars
+flat in vec3 vZenithColor;
+flat in vec3 vHorizonColor;
+flat in float vSunsetStrength;
+flat in float vNightAmount;
+flat in vec2 vSunDirHorizNorm;
+
+uniform float time; // Seconds elapsed, used to gently twinkle the stars
 
 // Cheap hash-based pseudo-random value in [0, 1] for a 3D input
 float hash3(vec3 p) {
@@ -98,36 +98,28 @@ float stars(vec3 dir) {
 void main() {
     vec3 dir = normalize(Direction);
 
-    // Blend zenith/horizon colors between day and night palettes based on daylight
-    vec3 zenithColor = mix(zenithNightColor, zenithDayColor, daylightFactor);
-    vec3 horizonColor = mix(horizonNightColor, horizonDayColor, daylightFactor);
-
     // Vertical gradient factor: 0 at horizon, 1 straight up. Biased with pow() so the
-    // horizon band stays fairly thin, matching Minecraft's look.
+    // horizon band stays fairly thin.
     float heightFactor = clamp(dir.y, 0.0, 1.0);
     heightFactor = pow(heightFactor, 0.45);
 
-    vec3 skyColor = mix(horizonColor, zenithColor, heightFactor);
+    vec3 skyColor = mix(vHorizonColor, vZenithColor, heightFactor);
 
-    // Warm sunrise/sunset glow near the horizon when the sun itself is near the horizon
-    float sunHeight = sunDirection.y;
-    float sunsetStrength = 1.0 - smoothstep(0.0, 0.35, abs(sunHeight));
+    // Warm sunrise/sunset glow near the horizon when the sun itself is near the horizon.
+    // vSunsetStrength and vSunDirHorizNorm are precomputed per-vertex (uniform-only).
     float horizonProximity = 1.0 - smoothstep(0.0, 0.4, abs(dir.y));
-    float facingSun = clamp(dot(dir, vec3(sunDirection.x, 0.0, sunDirection.z)) /
-                             max(length(vec2(sunDirection.x, sunDirection.z)), 0.0001), 0.0, 1.0);
+    float facingSun = clamp(dot(vec2(dir.x, dir.z), vSunDirHorizNorm), 0.0, 1.0);
     vec3 sunsetColor = vec3(1.0, 0.55, 0.25);
-    skyColor = mix(skyColor, sunsetColor, sunsetStrength * horizonProximity * facingSun * 0.55);
+    skyColor = mix(skyColor, sunsetColor, vSunsetStrength * horizonProximity * facingSun * 0.55);
 
     // Sky below the horizon fades toward the horizon color rather than showing "empty" void color
     if (dir.y < 0.0) {
-        skyColor = mix(skyColor, horizonColor, clamp(-dir.y * 2.0, 0.0, 1.0));
+        skyColor = mix(skyColor, vHorizonColor, clamp(-dir.y * 2.0, 0.0, 1.0));
     }
 
-    // Stars are only visible at night, faded out near the horizon and during daylight/twilight,
-    // matching Minecraft's behavior of stars only showing well above the true night sky.
-    float nightAmount = 1.0 - smoothstep(0.0, 0.35, daylightFactor);
+    // Stars are only visible at night, faded out near the horizon and during daylight/twilight.
     float starHorizonFade = smoothstep(0.02, 0.25, dir.y);
-    float starVisibility = nightAmount * starHorizonFade;
+    float starVisibility = vNightAmount * starHorizonFade;
 
     if (starVisibility > 0.0) {
         float s = stars(dir) * starVisibility;
