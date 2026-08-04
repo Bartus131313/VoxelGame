@@ -23,8 +23,15 @@ void MouseManager::setCursorLocked(const bool locked) {
     m_cursorLocked = locked;
     glfwSetInputMode(m_window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 
-    // Reset firstMouse flag so mouse doesn't jump violently when cursor locks
-    if (locked) m_firstMouse = true;
+    if (locked && m_window) {
+        int width = 0, height = 0;
+        glfwGetWindowSize(m_window, &width, &height);
+
+        const auto center = glm::vec2(static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f);
+        glfwSetCursorPos(m_window, center.x, center.y);
+        m_position = center;
+        m_firstMouse = true;
+    }
 }
 
 bool MouseManager::isButtonDown(const int button) const {
@@ -43,20 +50,31 @@ bool MouseManager::isButtonJustReleased(const int button) const {
 }
 
 void MouseManager::cursorPosCallback(GLFWwindow* window, const double xPos, const double yPos) {
-    // Route to static Input facade's mouse manager instance
     MouseManager& mouse = Input::getMouse();
-
     const auto currentPos = glm::vec2(static_cast<float>(xPos), static_cast<float>(yPos));
 
     if (mouse.m_firstMouse) {
         mouse.m_position = currentPos;
         mouse.m_firstMouse = false;
+        return;
     }
 
-    // Calculate position change since last frame
+    // Calculate delta relative to last registered position
     mouse.m_delta.x += currentPos.x - mouse.m_position.x;
     mouse.m_delta.y += mouse.m_position.y - currentPos.y; // Invert Y so up is positive
-    mouse.m_position = currentPos;
+
+    if (mouse.m_cursorLocked) {
+        int width = 0, height = 0;
+        glfwGetWindowSize(window, &width, &height);
+
+        const auto center = glm::vec2(static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f);
+
+        // Reset virtual cursor position back to window center and keep m_position centered
+        glfwSetCursorPos(window, center.x, center.y);
+        mouse.m_position = center;
+    } else {
+        mouse.m_position = currentPos;
+    }
 }
 
 void MouseManager::mouseButtonCallback(GLFWwindow* window, const int button, const int action, const int mods) {
