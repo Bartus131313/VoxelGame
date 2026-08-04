@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/constants.hpp>
 
-#include "../Renderer.h"
+#include "../RenderSystem.h"
 #include "../../Game.h"
 #include "../../../core/Logger.h"
 #include "../shader/ShaderManager.h"
@@ -78,8 +78,8 @@ void SkyRenderer::update(const std::int64_t ticks) {
 
 void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) const {
     // Setup state for sky rendering
-    Renderer::setDepthFunc(GL_LEQUAL);
-    Renderer::setFaceCulling(false);
+    RenderSystem::setDepthFunc(GL_LEQUAL);
+    RenderSystem::setFaceCulling(false);
 
     renderSkyDome(view, projection);
 
@@ -90,8 +90,8 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     const glm::vec3 moonDir = -sunDir; // Moon is always opposite the sun
 
     // Setup state for celestial bodies
-    Renderer::setBlending(true);
-    Renderer::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    RenderSystem::setBlending(true);
+    RenderSystem::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Sun: full-size atlas (no phases), full brightness, only really visible while above horizon
     const float sunBrightness = glm::clamp(sunDir.y * 4.0f + 0.2f, 0.0f, 1.0f);
@@ -116,9 +116,9 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     }
 
     // Restore default 3D pipeline states
-    Renderer::setBlending(false);
-    Renderer::setDepthFunc(GL_LESS);
-    Renderer::setFaceCulling(true);
+    RenderSystem::setBlending(false);
+    RenderSystem::setDepthFunc(GL_LESS);
+    RenderSystem::setFaceCulling(true);
 }
 
 void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projection) const {
@@ -179,5 +179,5 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     glBindVertexArray(0);
 
     // Check if there was any error while rendering celestial body
-    Renderer::checkError("celestial body rendering");
+    RenderSystem::checkError("celestial body rendering");
 }

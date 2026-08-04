@@ -6,7 +6,7 @@
 #include "../core/Logger.h"
 #include "../input/Input.h"
 #include "glm/ext/matrix_transform.hpp"
-#include "render/Renderer.h"
+#include "render/RenderSystem.h"
 #include "render/texture/TextureManager.h"
 
 Game::Game()
@@ -16,7 +16,7 @@ Game::Game()
     m_window.addEventListener(this);
 
     // Initialize global state manager
-    Renderer::init();
+    RenderSystem::init();
 }
 
 void Game::update(const float deltaTime) {
@@ -48,7 +48,7 @@ void Game::update(const float deltaTime) {
 
 void Game::render() {
     // Clear background using Sky Blue color
-    Renderer::clear(0.5f, 0.8f, 1.0f);
+    RenderSystem::clear(0.5f, 0.8f, 1.0f);
 
     m_world.render();
 
@@ -75,7 +75,7 @@ void Game::render() {
 
 void Game::onWindowResize(const int width, const int height) {
     // Change viewport using Renderer
-    Renderer::setViewport(width, height);
+    RenderSystem::setViewport(width, height);
 
     // Set the canvas size to the current one
     m_canvas.setSize(width, height);

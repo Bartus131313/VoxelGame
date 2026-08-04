@@ -1,6 +1,6 @@
 #include "SkyboxMesh.h"
 
-#include "../../Renderer.h"
+#include "../../RenderSystem.h"
 
 SkyboxMesh::SkyboxMesh() {
     setupBuffers();
@@ -95,13 +95,13 @@ void SkyboxMesh::unbind() const {
 void SkyboxMesh::render() const {
     if (m_vao == 0) return;
 
-    Renderer::setFaceCulling(false);
+    RenderSystem::setFaceCulling(false);
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
-    Renderer::setFaceCulling(true);
+    RenderSystem::setFaceCulling(true);
 }
 
 void SkyboxMesh::cleanup() {

@@ -10,7 +10,7 @@
  *
  * Centralizes OpenGL global state configuration.
  */
-class Renderer {
+class RenderSystem {
 public:
     /**
      * @brief Configures initial global OpenGL pipeline states.
@@ -53,16 +53,23 @@ public:
     /**
      * @brief Enables or disables face culling.
      *
-     * @param enable True to cull back faces, false to render both sides.
+     * @param enable @c true to cull back faces, @c false to render both sides.
      */
     static void setFaceCulling(bool enable);
 
     /**
      * @brief Enables or disables alpha blending.
      *
-     * @param enable True to enable blending, false to disable.
+     * @param enable @c true to enable blending, @c false to disable.
      */
     static void setBlending(bool enable);
+
+    /**
+     * @brief Enables of disables depth test.
+     *
+     * @param enable @c true to enable depth test, @c false to disable.
+     */
+    static void setDepthTest(bool enable);
 
     /**
      * @brief Sets the alpha blending function factors.

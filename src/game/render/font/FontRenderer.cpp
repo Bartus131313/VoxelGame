@@ -3,7 +3,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-#include "../Renderer.h"
+#include "../RenderSystem.h"
 #include "../Vertex.h"
 
 void FontRenderer::renderText(const Shader* shader, const FontData* fontData, const std::string& text,
@@ -11,8 +11,8 @@ void FontRenderer::renderText(const Shader* shader, const FontData* fontData, co
     if (!fontData || text.empty()) return;
 
     // Enable Blending for font transparency
-    Renderer::setBlending(true);
-    Renderer::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    RenderSystem::setBlending(true);
+    RenderSystem::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Bind Shader and Set Uniforms
     shader->setVec4("textColor", color);

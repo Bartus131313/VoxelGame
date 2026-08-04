@@ -57,8 +57,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/texture/TextureManager.h
         src/game/render/sky/SkyRenderer.cpp
         src/game/render/sky/SkyRenderer.h
-        src/game/render/Renderer.cpp
-        src/game/render/Renderer.h
+        src/game/render/RenderSystem.cpp
+        src/game/render/RenderSystem.h
         src/game/entity/Entity.cpp
         src/game/entity/Entity.h
         src/core/Logger.cpp
