@@ -49,6 +49,8 @@ add_executable(${PROJECT_NAME}
         src/game/entity/Player.h
         src/core/IWindowEventListener.h
         src/game/render/mesh/Mesh.h
+        src/game/render/mesh/impl/StaticMesh.cpp
+        src/game/render/mesh/impl/StaticMesh.h
         src/game/render/texture/TextureManager.cpp
         src/game/render/texture/TextureManager.h
         src/game/render/Renderer.cpp
