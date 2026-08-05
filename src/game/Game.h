@@ -83,8 +83,9 @@ private:
 
     Window m_window;    ///< Core window wrapper managing the GLFW context and render surface.
 
-    Canvas m_canvas;                                    ///< Debug UI canvas used to render some debug info.
-    std::shared_ptr<UILabel> m_fpsLabel = nullptr;      ///< Debug label that displays FPS.
+    Canvas m_canvas;                                        ///< Debug UI canvas used to render some debug info.
+    std::shared_ptr<UILabel> m_fpsLabel = nullptr;          ///< Debug label that displays FPS.
+    std::shared_ptr<UILabel> m_renderModeLabel = nullptr;   ///< Debug label that displays current render mode.
 
     World m_world;
 

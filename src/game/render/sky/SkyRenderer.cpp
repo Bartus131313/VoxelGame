@@ -81,6 +81,10 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     RenderSystem::setDepthFunc(GL_LEQUAL);
     RenderSystem::setFaceCulling(false);
 
+    // Make the sky to always render with Fill mode
+    const RenderMode tempRenderMode = RenderSystem::getRenderMode();
+    RenderSystem::setRenderMode(Fill);
+
     renderSkyDome(view, projection);
 
     // Compute sun/moon directions from the current day progress.
@@ -119,6 +123,9 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     RenderSystem::setBlending(false);
     RenderSystem::setDepthFunc(GL_LESS);
     RenderSystem::setFaceCulling(true);
+
+    // Restore render mode
+    RenderSystem::setRenderMode(tempRenderMode);
 }
 
 void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projection) const {

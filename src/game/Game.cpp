@@ -42,6 +42,12 @@ void Game::update(const float deltaTime) {
         LOG_DEBUG("Cursor {}", !currentLocked ? "Locked" : "Unlocked");
     }
 
+    // Toggle Render Mode (Fill/Line)
+    if (Input::isActionJustPressed("toggle_render_mode")) {
+        const RenderMode currentMode = RenderSystem::getRenderMode();
+        RenderSystem::setRenderMode(currentMode == Fill ? Line : Fill);
+    }
+
     // Update world
     m_world.update(deltaTime);
 }
@@ -50,26 +56,14 @@ void Game::render() {
     // Clear background using Sky Blue color
     RenderSystem::clear(0.5f, 0.8f, 1.0f);
 
+    // Render world
     m_world.render();
 
-    // const auto viewMatrix = m_player.getCamera().getViewMatrix();
-    // const auto projectionMatrix = m_player.getCamera().getProjectionMatrix();
-    //
-    // // Render procedural sky
-    // m_skyRenderer.render(viewMatrix, projectionMatrix);
-    //
-    // // Render test triangle
-    // if (m_testShader) {
-    //     m_testShader->use();
-    //     m_testShader->setMat4("model", m_testModelMatrix);
-    //     m_testShader->setMat4("view", viewMatrix);
-    //     m_testShader->setMat4("projection", projectionMatrix);
-    //
-    //     glBindVertexArray(m_testVAO);
-    //     glDrawArrays(GL_TRIANGLES, 0, 3);
-    // }
-
+    // Update all dynamic labels
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
+    if (m_renderModeLabel) m_renderModeLabel->setText(std::format("Render mode: {}", RenderSystem::getRenderMode()));
+
+    // Render UI canvas
     m_canvas.render();
 }
 
@@ -103,31 +97,17 @@ int Game::run() {
 
     // Add elements to canvas
     ResourceLocation uiFontLocation{"fonts/ProximaNova.ttf"};
-    m_fpsLabel = m_canvas.addElement<UILabel>(uiFontLocation, 24, "FPS: 0");
+    m_fpsLabel = m_canvas.addElement<UILabel>(uiFontLocation, 32, "FPS: 0");
     if (m_fpsLabel) {
-        m_fpsLabel->setPosition(20, 20);
+        m_fpsLabel->setPosition(10, 10);
         m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
     }
 
-    // // Setup test triangle rendering
-    // m_testModelMatrix = glm::translate(m_testModelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
-    // m_testShader = ShaderManager::loadShader("test");
-    //
-    // constexpr float vertices[] = {
-    //     -0.5f, -0.5f, 0.0f,
-    //      0.5f, -0.5f, 0.0f,
-    //      0.0f,  0.5f, 0.0f
-    // };
-    //
-    // glGenVertexArrays(1, &m_testVAO);
-    // glGenBuffers(1, &m_testVBO);
-    //
-    // glBindVertexArray(m_testVAO);
-    // glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
-    // glEnableVertexAttribArray(0);
+    m_renderModeLabel = m_canvas.addElement<UILabel>(uiFontLocation, 24, "Render mode: FILL");
+    if (m_renderModeLabel) {
+        m_renderModeLabel->setPosition(10, 42);
+        m_renderModeLabel->setColor(glm::vec4(0.5f, 0.0f, 0.8f, 1.0f));
+    }
 
     LOG_INFO("Game initialized.");
 
@@ -170,6 +150,11 @@ void Game::setupInputBindings() {
     // Create action for window fullscreen
     Input::createAction("window_fullscreen");
     Input::bindKey("window_fullscreen", GLFW_KEY_F11);
+
+    // Create action for render mode toggle
+    Input::createAction("toggle_render_mode");
+    Input::bindKey("toggle_render_mode", GLFW_KEY_P);
+    Input::bindGamepadButton("toggle_render_mode", GLFW_GAMEPAD_BUTTON_Y);
 }
 
 void Game::cleanup() {
@@ -177,9 +162,6 @@ void Game::cleanup() {
     FontManager::cleanup();
     ShaderManager::cleanup();
     TextureManager::cleanup();
-
-    // glDeleteBuffers(1, &m_testVBO);
-    // glDeleteVertexArrays(1, &m_testVAO);
 
     LOG_INFO("Shutting down application...");
 }

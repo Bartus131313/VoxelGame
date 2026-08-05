@@ -4,6 +4,8 @@
 
 #include "../../core/Logger.h"
 
+RenderMode RenderSystem::m_renderMode{Fill};
+
 void RenderSystem::init() {
     // Enable depth buffer testing for correct 3D spatial sorting
     glEnable(GL_DEPTH_TEST);
@@ -71,9 +73,31 @@ void RenderSystem::checkError(std::string_view context, const std::source_locati
 void RenderSystem::enter2D() {
     setDepthTest(false);
     setFaceCulling(false);
+
+    // Always force solid fill mode for UI elements and text
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void RenderSystem::enter3D() {
     setDepthTest(true);
     setFaceCulling(true);
+
+    // Restore whatever render mode the 3D world is currently using
+    setRenderMode(m_renderMode);
+}
+
+void RenderSystem::setRenderMode(const RenderMode mode) {
+    m_renderMode = mode;
+
+    switch (mode) {
+        case Fill:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
+        case Line:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            break;
+        case Point:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+            break;
+    }
 }

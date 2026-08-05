@@ -1,9 +1,28 @@
 #pragma once
 
+#include <format>
 #include <source_location>
 #include <string_view>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+
+/** @brief Represents polygon mode used by OpenGL. */
+enum RenderMode : uint8_t {
+    Fill = 0, Line = 1, Point = 2
+};
+
+template <>
+struct std::formatter<RenderMode> : std::formatter<std::string_view> {
+    auto format(const RenderMode mode, std::format_context& ctx) const {
+        std::string_view name = "UNKNOWN";
+        switch (mode) {
+            case Fill:  name = "FILL"; break;
+            case Line:  name = "LINE"; break;
+            case Point: name = "POINT"; break;
+        }
+        return std::formatter<std::string_view>::format(name, ctx);
+    }
+};
 
 /**
  * @brief Global OpenGL state manager and rendering pipeline coordinator.
@@ -99,4 +118,21 @@ public:
      * on the next frame.
      */
     static void enter3D();
+
+    /**
+     * @brief Sets render mode to the new one. Useful for debug wireframe rendering.
+     *
+     * @param mode New render mode that will be applied.
+     */
+    static void setRenderMode(RenderMode mode);
+
+    /**
+     * @brief Returns current render mode used by OpenGL.
+     *
+     * @return Current render mode.
+     */
+    static RenderMode getRenderMode() { return m_renderMode; }
+
+private:
+    static RenderMode m_renderMode;
 };
