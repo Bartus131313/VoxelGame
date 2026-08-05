@@ -1,12 +1,10 @@
 #pragma once
 
 #include "../core/Window.h"
-#include "entity/impl/Player.h"
-#include "render/mesh/impl/SkyboxMesh.h"
-#include "render/sky/SkyRenderer.h"
+#include "render/world/WorldRenderer.h"
 #include "ui/Canvas.h"
 #include "ui/elements/UILabel.h"
-#include "world/World.h"
+#include "world/WorldData.h"
 
 /**
  * @brief Main application controller that manages the window lifecycle,
@@ -87,7 +85,8 @@ private:
     std::shared_ptr<UILabel> m_fpsLabel = nullptr;          ///< Debug label that displays FPS.
     std::shared_ptr<UILabel> m_renderModeLabel = nullptr;   ///< Debug label that displays current render mode.
 
-    World m_world;
+    WorldData m_worldData;          ///< Stores all raw data about world.
+    WorldRenderer m_worldRenderer;  ///< Renders raw world data on to the screen.
 
     double m_lastUpdateTime{};      ///< Last time when game was updated.
     double m_lastRenderTime{};      ///< Last time when game was rendered.

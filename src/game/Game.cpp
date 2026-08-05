@@ -1,6 +1,5 @@
 #include "Game.h"
 
-#include <iostream>
 #include <glm/glm.hpp>
 
 #include "../core/Logger.h"
@@ -49,15 +48,16 @@ void Game::update(const float deltaTime) {
     }
 
     // Update world
-    m_world.update(deltaTime);
+    m_worldData.update(deltaTime);
+    m_worldRenderer.update(m_worldData, deltaTime);
 }
 
 void Game::render() {
     // Clear background using Sky Blue color
     RenderSystem::clear(0.5f, 0.8f, 1.0f);
 
-    // Render world
-    m_world.render();
+    // Render world using WorldRenderer
+    m_worldRenderer.render(m_worldData);
 
     // Update all dynamic labels
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
@@ -75,7 +75,7 @@ void Game::onWindowResize(const int width, const int height) {
     m_canvas.setSize(width, height);
 
     // Update local player camera aspect ratio
-    if (Player* localPlayer = m_world.getLocalPlayer()) {
+    if (const Player* localPlayer = m_worldData.getLocalPlayer()) {
         localPlayer->getCamera().updateAspect(m_window.getWidth(), m_window.getHeight());
     }
 }

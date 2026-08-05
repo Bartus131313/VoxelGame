@@ -64,14 +64,16 @@ add_executable(${PROJECT_NAME}
         src/game/entity/Entity.h
         src/core/Logger.cpp
         src/core/Logger.h
-        src/game/world/World.cpp
-        src/game/world/World.h
         src/game/resource/ResourceLocation.h
         src/game/world/chunk/SubChunkData.h
         src/game/world/block/BlockState.h
         src/game/world/chunk/ChunkData.h
         src/game/world/chunk/RegionData.h
         src/game/world/WorldConfig.h
+        src/game/world/WorldData.cpp
+        src/game/world/WorldData.h
+        src/game/render/world/WorldRenderer.cpp
+        src/game/render/world/WorldRenderer.h
 )
 
 # Include Directories for Headers

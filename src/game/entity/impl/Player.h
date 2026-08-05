@@ -36,7 +36,7 @@ public:
      *
      * @return Camera3D used to project everything on the screen.
      */
-    [[nodiscard]] Camera3D& getCamera() { return m_camera; }
+    [[nodiscard]] Camera3D getCamera() const { return m_camera; }
 
     /**
      * @brief Sets the player's position and immediately re-syncs the camera to match.

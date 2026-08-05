@@ -1,28 +1,26 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <unordered_map>
-#include <cstdint>
 
 #include "../entity/Entity.h"
 #include "../entity/impl/Player.h"
-#include "../render/sky/SkyRenderer.h"
-#include "block/BlockState.h"
-#include "chunk/ChunkData.h"
 #include "chunk/RegionData.h"
 
-class World {
+/** @brief Represents all data that belongs to the world. Only updates everything, does not render. */
+class WorldData {
 public:
-    World();
-    ~World();
+    WorldData();
+    ~WorldData();
 
-    // Prevent accidental copying (World owns unique resources)
-    World(const World&) = delete;
-    World& operator=(const World&) = delete;
+    // Prevent accidental copying (WorldData owns unique resources)
+    WorldData(const WorldData&) = delete;
+    WorldData& operator=(const WorldData&) = delete;
 
     // Allow moving
-    World(World&&) noexcept = default;
-    World& operator=(World&&) noexcept = default;
+    WorldData(WorldData&&) noexcept = default;
+    WorldData& operator=(WorldData&&) noexcept = default;
 
     /**
      * @brief Updates all entities and processes fixed game ticks.
@@ -30,18 +28,6 @@ public:
      * @param deltaTime Time elapsed since the previous frame.
      */
     void update(float deltaTime);
-
-    /**
-     * @brief Renders all terrain, sky, and entities.
-     *
-     * @param camera Active scene camera for view/projection matrices.
-     */
-    void render(const Camera3D& camera);
-
-    /**
-     * @brief Renders all terrain, sky, and entities using local player's camera if exists.
-     */
-    void render();
 
     /**
      * @brief Retrieves a block state at global world block coordinates (x, y, z).
@@ -84,9 +70,9 @@ public:
     }
 
     /** @brief Retrieves a loaded region by region world coordinates. Returns nullptr if not loaded. */
-    [[nodiscard]] RegionData* getRegion(const int32_t regionX, int32_t const regionZ) {
+    [[nodiscard]] RegionData* getRegion(const int32_t regionX, const int32_t regionZ) {
         const uint64_t key = packKey(regionX, regionZ);
-        auto it = m_regions.find(key);
+        const auto it = m_regions.find(key);
         return (it != m_regions.end()) ? it->second.get() : nullptr;
     }
 
@@ -155,8 +141,10 @@ public:
 
     /**
      * @brief Spawns a new entity in the world.
+     *
      * @tparam T Entity type deriving from Entity.
      * @tparam Args Constructor arguments for T.
+     *
      * @return Raw pointer to the newly created entity.
      */
     template<typename T, typename... Args>
@@ -178,15 +166,23 @@ public:
     }
 
     /**
+    * @brief Returns a read-only reference to all entities in the world.
+    */
+    [[nodiscard]] const std::unordered_map<uint64_t, std::unique_ptr<Entity>>& getEntities() const {
+        return m_entities;
+    }
+
+    /**
      * @brief Gets the Local Player reference without taking ownership.
+     *
      * @return Non-owning pointer to Player, or nullptr if not spawned.
      */
     [[nodiscard]] Player* getLocalPlayer() const { return m_localPlayer; }
 
-private:
-    const ResourceLocation sunTextureLocation{"textures/environment/celestial/sun.png"};
-    const ResourceLocation moonAtlasLocation{"textures/environment/celestial/moon_phases.png"};
+    /** @brief Returns world ticks since the start. */
+    [[nodiscard]] int64_t getWorldTicks() const { return m_worldTicks; }
 
+private:
     /** @brief Executes fixed game ticks (physics, logic, world simulation). */
     void tick();
 
@@ -197,7 +193,6 @@ private:
     std::unordered_map<uint64_t, std::unique_ptr<Entity>> m_entities;
 
     Player* m_localPlayer = nullptr;    ///< Non-owning raw pointer targeting the local player in m_entities.
-    SkyRenderer m_skyRenderer{};        ///< Procedural sky environment.
 
     int64_t m_worldTicks{0};            ///< Total game ticks executed.
     float m_tickAccumulator{0.0f};      ///< Accumulated time for fixed timestep updates.
