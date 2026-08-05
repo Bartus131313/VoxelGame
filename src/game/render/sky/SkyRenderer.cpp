@@ -24,6 +24,16 @@ namespace {
     };
 }
 
+SkyRenderer::~SkyRenderer() {
+    // There is no need to free shaders or textures as they are cleaned up in their own managers
+    // Also dome mesh is cleaned up automatically so only free VAO and VBO used to render celestial billboard
+
+    glDeleteVertexArrays(1, &m_celestialVAO);
+    glDeleteBuffers(1, &m_celestialVBO);
+
+    LOG_INFO("Sky Renderer cleaned up.");
+}
+
 void SkyRenderer::init(const ResourceLocation& sunResource, const ResourceLocation& moonAtlasResource) {
     // Load all shaders first
     m_domeShader = ShaderManager::loadShader(skyDomeShaderLocation);

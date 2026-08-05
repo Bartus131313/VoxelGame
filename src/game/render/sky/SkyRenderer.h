@@ -20,6 +20,7 @@
 class SkyRenderer {
 public:
     SkyRenderer() = default;
+    ~SkyRenderer();
 
     /**
      * @brief Loads shaders and textures required by the sky renderer.
