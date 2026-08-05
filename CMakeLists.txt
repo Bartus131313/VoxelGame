@@ -67,6 +67,10 @@ add_executable(${PROJECT_NAME}
         src/game/world/World.cpp
         src/game/world/World.h
         src/game/resource/ResourceLocation.h
+        src/game/world/chunk/SubChunkData.h
+        src/game/world/block/BlockState.h
+        src/game/world/chunk/ChunkData.h
+        src/game/world/chunk/RegionData.h
         src/game/world/WorldConfig.h
 )
 
