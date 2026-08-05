@@ -4,6 +4,7 @@
 
 #include "../Game.h"
 #include "../../core/Logger.h"
+#include "../render/RenderSystem.h"
 
 World::World() {
     // Initialize sky renderer
@@ -45,6 +46,9 @@ void World::tick() {
 }
 
 void World::render(const Camera3D& camera) {
+    // Enter 3D rendering
+    RenderSystem::enter3D();
+
     // Render skybox
     m_skyRenderer.render(camera.getViewMatrix(), camera.getProjectionMatrix());
 

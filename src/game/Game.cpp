@@ -102,9 +102,12 @@ int Game::run() {
     m_lastRenderTime = currentTime;
 
     // Add elements to canvas
-    m_fpsLabel = m_canvas.addElement<UILabel>("fonts/ProximaNova.ttf", 24, "FPS: 0");
-    m_fpsLabel->setPosition(20, 20);
-    m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
+    ResourceLocation uiFontLocation{"fonts/ProximaNova.ttf"};
+    m_fpsLabel = m_canvas.addElement<UILabel>(uiFontLocation, 24, "FPS: 0");
+    if (m_fpsLabel) {
+        m_fpsLabel->setPosition(20, 20);
+        m_fpsLabel->setColor(glm::vec4(0.7f, 0.0f, 1.0f, 1.0f));
+    }
 
     // // Setup test triangle rendering
     // m_testModelMatrix = glm::translate(m_testModelMatrix, glm::vec3(0.0f, 0.0f, -2.0f));

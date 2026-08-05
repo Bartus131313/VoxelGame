@@ -5,6 +5,7 @@
 
 #include <string>
 
+#include "../../../core/Logger.h"
 #include "../../render/shader/ShaderManager.h"
 
 /** @brief A 2D UI element responsible for rendering text labels on screen using cached font resources. */
@@ -13,14 +14,14 @@ public:
     /**
      * @brief Constructs a UILabel with a specified font, text content, font size, and tint color.
      *
-     * @param fontFilePath Relative path to the font file in the fonts' directory.
+     * @param fontFileLocation ResourceLocation pointing to the font file.
      * @param fontSize Target height of the font in pixels.
      * @param text Initial text content to render.
      * @param color Initial RGBA color vector for text tinting (defaults to solid white).
      */
-    UILabel(const std::string& fontFilePath, const int fontSize, std::string text,
+    UILabel(const ResourceLocation& fontFileLocation, const int fontSize, std::string text,
         const glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f})
-        : m_fontData(FontManager::loadFont({fontFilePath}, fontSize)), m_text(std::move(text)), m_color(color) {
+        : m_fontData(FontManager::loadFont(fontFileLocation, fontSize)), m_text(std::move(text)), m_color(color) {
         m_shader = ShaderManager::loadShader(fontShaderLocation);
     }
 

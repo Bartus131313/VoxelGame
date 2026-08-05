@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <algorithm>
+
+#include "../render/RenderSystem.h"
 #include "glm/ext/matrix_transform.hpp"
 
 Canvas::Canvas(const int screenWidth, const int screenHeight) {
@@ -28,6 +30,9 @@ void Canvas::render() const {
     std::ranges::stable_sort(sortedElements, [](const UIElement* a, const UIElement* b) {
         return a->getZIndex() < b->getZIndex();
     });
+
+    // Enter 2D rendering
+    RenderSystem::enter2D();
 
     // Draw all visible UI elements in a single pass based on z-index
     for (const auto& element : sortedElements) {
