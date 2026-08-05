@@ -5,8 +5,8 @@
 
 #include "Logger.h"
 
-Window::Window(const int width, const int height, std::string  title)
-    : m_width(width), m_height(height), m_title(std::move(title))
+Window::Window(const int width, const int height, std::string title, const WindowFlags flags)
+    : m_width(width), m_height(height), m_title(std::move(title)), m_flags(flags)
 {
     init();
 }
@@ -66,8 +66,12 @@ void Window::init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+    // Configure GLFW window hints from flags
+    glfwWindowHint(GLFW_RESIZABLE,   hasFlag(m_flags, WindowFlags::Resizable)   ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_FLOATING,    hasFlag(m_flags, WindowFlags::AlwaysOnTop) ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_FOCUSED,     hasFlag(m_flags, WindowFlags::Focused)     ? GLFW_TRUE : GLFW_FALSE);
 
     // Create GLFW window handle
     m_handle = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
@@ -84,6 +88,9 @@ void Window::init() {
         LOG_ERROR("Failed to initialize GLAD!");
         return;
     }
+
+    // Post-initialization flags
+    glfwSwapInterval(hasFlag(m_flags, WindowFlags::VSync) ? 1 : 0);
 
     // Store 'this' pointer in GLFW so static callbacks can route to instance members
     glfwSetWindowUserPointer(m_handle, this);
