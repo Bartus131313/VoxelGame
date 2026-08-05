@@ -14,11 +14,21 @@
  */
 class Game : public IWindowEventListener {
 public:
+    // Window configuration
+
     static constexpr auto WINDOW_TITLE  = "Voxel Game"; ///< Title displayed in the window header.
     static constexpr int  WINDOW_WIDTH  = 1280;         ///< Initial rendering width in pixels.
     static constexpr int  WINDOW_HEIGHT = 720;          ///< Initial rendering height in pixels.
 
+    // -----
+
+    // Game configuration
+
+    static constexpr int  MAX_RENDER_DISTANCE   = 32;    /// Max amount of chunks in any direction that can be rendered.
+
     static constexpr float TICKS_PER_SECOND = 20.0f;    ///< How many ticks are in 1 second?
+
+    // -----
 
     /** @brief Constructs the Game application instance. */
     Game();

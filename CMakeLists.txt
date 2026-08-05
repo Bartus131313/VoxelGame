@@ -67,6 +67,7 @@ add_executable(${PROJECT_NAME}
         src/game/world/World.cpp
         src/game/world/World.h
         src/game/resource/ResourceLocation.h
+        src/game/world/WorldConfig.h
 )
 
 # Include Directories for Headers
