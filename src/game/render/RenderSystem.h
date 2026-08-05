@@ -86,4 +86,17 @@ public:
      */
     static void checkError(std::string_view context = "",
                            std::source_location location = std::source_location::current());
+
+    /**
+     * @brief Enters flat 2D/UI rendering mode (disables depth test + face culling).
+     */
+    static void enter2D();
+
+    /**
+     * @brief Restores global GL state for 3D world rendering (depth testing + back-face culling).
+     *
+     * Call this after a 2D/UI pass to bring GL state back to what the 3D world pass expects
+     * on the next frame.
+     */
+    static void enter3D();
 };

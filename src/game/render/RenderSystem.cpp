@@ -67,3 +67,13 @@ void RenderSystem::checkError(std::string_view context, const std::source_locati
         }
     }
 }
+
+void RenderSystem::enter2D() {
+    setDepthTest(false);
+    setFaceCulling(false);
+}
+
+void RenderSystem::enter3D() {
+    setDepthTest(true);
+    setFaceCulling(true);
+}
