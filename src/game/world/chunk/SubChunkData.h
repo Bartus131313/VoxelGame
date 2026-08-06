@@ -17,6 +17,10 @@ public:
     /**
      * @brief Fast 3D local coordinate lookup (0-15 range for x, y, z).
      *
+     * @param x X position of block in local space.
+     * @param y Y position of block in local space.
+     * @param z Z position of block in local space.
+     *
      * @return BlockState at given 3D local position.
      */
     [[nodiscard]] BlockState getBlockState(const uint8_t x, const uint8_t y, const uint8_t z) const {
@@ -26,6 +30,8 @@ public:
     /**
      * @brief Safe 1D index getter.
      *
+     * @param index Index of the block.
+     *
      * @return BlockState at given index or default BlockState (air) if out of bounds.
      */
     [[nodiscard]] BlockState getBlockStateAt(const size_t index) const {
@@ -33,12 +39,24 @@ public:
         return m_blockData[index];
     }
 
-    /** @brief Fast 3D local coordinate setter. */
+    /**
+     * @brief Fast 3D local coordinate setter.
+     *
+     * @param x X position of block in local space.
+     * @param y Y position of block in local space.
+     * @param z Z position of block in local space.
+     * @param state New block state that will be set.
+     */
     void setBlockState(const uint8_t x, const uint8_t y, const uint8_t z, const BlockState state) {
         m_blockData[(y << 8) | (z << 4) | x] = state;
     }
 
-    /** @brief Safe 1D index setter (does nothing if index is out of bounds). */
+    /**
+     * @brief Safe 1D index setter (does nothing if index is out of bounds).
+     *
+     * @param index Index of the block.
+     * @param state New block state that will be set.
+     */
     void setBlockStateAt(const size_t index, const BlockState state) {
         if (index >= m_blockData.size()) return;
         m_blockData[index] = state;

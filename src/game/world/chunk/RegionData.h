@@ -22,12 +22,11 @@ public:
      *
      * @return Pointer to ChunkData or nullptr if not generated/loaded yet.
      */
-    [[nodiscard]] ChunkData* getChunkLocal(const uint8_t localX, const uint8_t localZ) {
+    [[nodiscard]] ChunkData* getChunkLocal(const uint8_t localX, const uint8_t localZ) const {
         if (localX >= WorldConfig::REGION_SIZE || localZ >= WorldConfig::REGION_SIZE)
             return nullptr;
 
-        // TODO: If somehow in the future the subchunk size will change, this below NEEDS to be changed too.
-        return m_chunks[(localZ << 4) | localX].get();
+        return m_chunks[(static_cast<size_t>(localZ) * WorldConfig::REGION_SIZE) + localX].get();
     }
 
     /**
@@ -35,7 +34,7 @@ public:
      *
      * Automatically converts world chunk coordinates to local 0..15 region indices.
      */
-    [[nodiscard]] ChunkData* getChunk(const int32_t chunkX, const int32_t chunkZ) {
+    [[nodiscard]] ChunkData* getChunk(const int32_t chunkX, const int32_t chunkZ) const {
         const uint8_t localX = getLocalChunkCoord(chunkX);
         const uint8_t localZ = getLocalChunkCoord(chunkZ);
         return getChunkLocal(localX, localZ);
@@ -46,8 +45,7 @@ public:
         if (localX >= WorldConfig::REGION_SIZE || localZ >= WorldConfig::REGION_SIZE)
             return nullptr;
 
-        // TODO: If somehow in the future the subchunk size will change, this below NEEDS to be changed too.
-        const size_t index = (localZ << 4) | localX;
+        const size_t index = (static_cast<size_t>(localZ) * WorldConfig::REGION_SIZE) + localX;
         if (!m_chunks[index]) {
             const int32_t worldChunkX = (m_regionX * WorldConfig::REGION_SIZE) + localX;
             const int32_t worldChunkZ = (m_regionZ * WorldConfig::REGION_SIZE) + localZ;
@@ -63,6 +61,12 @@ public:
     /** @brief Returns region Z coordinate in world region units. */
     [[nodiscard]] int32_t getRegionZ() const { return m_regionZ; }
 
+    /** @brief Returns the raw grid of chunk slots owned by this region (some entries may be null). */
+    [[nodiscard]] const std::array<std::unique_ptr<ChunkData>,
+        static_cast<size_t>(WorldConfig::REGION_SIZE) * WorldConfig::REGION_SIZE>& getAllChunks() const {
+        return m_chunks;
+    }
+
     /** @brief Helper to convert any world chunk coordinate to a 0..15 local region coordinate. */
     [[nodiscard]] static uint8_t getLocalChunkCoord(const int32_t worldChunkCoord) {
         const int32_t mod = worldChunkCoord % WorldConfig::REGION_SIZE;
@@ -73,6 +77,6 @@ private:
     int32_t m_regionX{0}; ///< World region X coordinate.
     int32_t m_regionZ{0}; ///< World region Z coordinate.
 
-    /// Grid of ChunkData instances.
-    std::array<std::unique_ptr<ChunkData>, WorldConfig::REGION_SIZE> m_chunks{};
+    /// Grid of ChunkData instances (REGION_SIZE x REGION_SIZE, row-major by Z then X).
+    std::array<std::unique_ptr<ChunkData>, WorldConfig::REGION_AREA> m_chunks{};
 };

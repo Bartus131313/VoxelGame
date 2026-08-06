@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glad/glad.h>
+
 /** @brief Represents a single 2D vertex containing spatial position and texture coordinates. */
 struct Vertex2D {
     float x{}, y{};     ///< Spatial position coordinates in 2D space.

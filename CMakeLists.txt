@@ -17,7 +17,6 @@ add_subdirectory(third_party/glfw)
 # Define Executable & Source Files
 add_executable(${PROJECT_NAME}
         third_party/glad/src/glad.c
-        third_party/nlohmann/json/json.hpp
         src/main.cpp
         src/core/Window.cpp
         src/core/Window.h
@@ -74,6 +73,7 @@ add_executable(${PROJECT_NAME}
         src/game/world/WorldData.h
         src/game/render/world/WorldRenderer.cpp
         src/game/render/world/WorldRenderer.h
+        src/game/world/Direction.h
 )
 
 # Include Directories for Headers

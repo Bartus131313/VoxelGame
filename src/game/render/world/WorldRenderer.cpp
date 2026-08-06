@@ -13,7 +13,7 @@ WorldRenderer::~WorldRenderer() {
     // Nothing need to be cleaned up here now
 }
 
-void WorldRenderer::update(const WorldData& worldData, float deltaTime) {
+void WorldRenderer::update(const WorldData& worldData, const float deltaTime) {
     // Update sky renderer
     m_skyRenderer.update(worldData.getWorldTicks());
 }
