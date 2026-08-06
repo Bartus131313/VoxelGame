@@ -4,21 +4,21 @@
 
 #include "../../core/Logger.h"
 
-RenderMode RenderSystem::m_renderMode{Fill};
+RenderMode RenderSystem::s_renderMode{Fill};
 
 void RenderSystem::init() {
     // Enable depth buffer testing for correct 3D spatial sorting
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    setDepthTest(true);
+    setDepthFunc(DepthFunc::Less);
 
     // Enable backface culling to optimize fragment processing
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+    setFaceCulling(true);
+    setCullFace(CullFace::Back);
+    setWindingOrder(WindingOrder::CounterClockwise);
 
     // Enable alpha channel blending for transparent textures and UI elements
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    setBlending(true);
+    setBlendFunc(BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha);
 
     LOG_INFO("Initialized global OpenGL states.");
 }
@@ -37,8 +37,24 @@ void RenderSystem::setViewport(const int width, const int height) {
     glViewport(0, 0, width, height);
 }
 
-void RenderSystem::setDepthFunc(const GLenum func) {
-    glDepthFunc(func);
+void RenderSystem::setDepthTest(const bool enable) {
+    if (enable) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+}
+
+void RenderSystem::setDepthFunc(const DepthFunc func) {
+    GLenum glFunc = GL_LESS;
+    switch (func) {
+        case DepthFunc::Never:          glFunc = GL_NEVER; break;
+        case DepthFunc::Less:           glFunc = GL_LESS; break;
+        case DepthFunc::Equal:          glFunc = GL_EQUAL; break;
+        case DepthFunc::LessOrEqual:    glFunc = GL_LEQUAL; break;
+        case DepthFunc::Greater:        glFunc = GL_GREATER; break;
+        case DepthFunc::NotEqual:       glFunc = GL_NOTEQUAL; break;
+        case DepthFunc::GreaterOrEqual: glFunc = GL_GEQUAL; break;
+        case DepthFunc::Always:         glFunc = GL_ALWAYS; break;
+    }
+    glDepthFunc(glFunc);
 }
 
 void RenderSystem::setFaceCulling(const bool enable) {
@@ -46,18 +62,74 @@ void RenderSystem::setFaceCulling(const bool enable) {
     else glDisable(GL_CULL_FACE);
 }
 
+void RenderSystem::setCullFace(const CullFace face) {
+    switch (face) {
+        case CullFace::Front:        glCullFace(GL_FRONT); break;
+        case CullFace::Back:         glCullFace(GL_BACK); break;
+        case CullFace::FrontAndBack: glCullFace(GL_FRONT_AND_BACK); break;
+    }
+}
+
+void RenderSystem::setWindingOrder(const WindingOrder order) {
+    switch (order) {
+        case WindingOrder::Clockwise:        glFrontFace(GL_CW); break;
+        case WindingOrder::CounterClockwise: glFrontFace(GL_CCW); break;
+    }
+}
+
 void RenderSystem::setBlending(const bool enable) {
     if (enable) glEnable(GL_BLEND);
     else glDisable(GL_BLEND);
 }
 
-void RenderSystem::setDepthTest(const bool enable) {
-    if (enable) glEnable(GL_DEPTH_TEST);
-    else glDisable(GL_DEPTH_TEST);
+static GLenum toGLFactor(const BlendFactor factor) {
+    switch (factor) {
+        case BlendFactor::Zero:                  return GL_ZERO;
+        case BlendFactor::One:                   return GL_ONE;
+        case BlendFactor::SrcColor:              return GL_SRC_COLOR;
+        case BlendFactor::OneMinusSrcColor:      return GL_ONE_MINUS_SRC_COLOR;
+        case BlendFactor::DstColor:              return GL_DST_COLOR;
+        case BlendFactor::OneMinusDstColor:      return GL_ONE_MINUS_DST_COLOR;
+        case BlendFactor::SrcAlpha:              return GL_SRC_ALPHA;
+        case BlendFactor::OneMinusSrcAlpha:      return GL_ONE_MINUS_SRC_ALPHA;
+        case BlendFactor::DstAlpha:              return GL_DST_ALPHA;
+        case BlendFactor::OneMinusDstAlpha:      return GL_ONE_MINUS_DST_ALPHA;
+        case BlendFactor::ConstantColor:         return GL_CONSTANT_COLOR;
+        case BlendFactor::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
+        case BlendFactor::ConstantAlpha:         return GL_CONSTANT_ALPHA;
+        case BlendFactor::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
+    }
+    return GL_ONE;
 }
 
-void RenderSystem::setBlendFunc(const GLenum sourceFactor, const GLenum destFactor) {
-    glBlendFunc(sourceFactor, destFactor);
+void RenderSystem::setBlendFunc(const BlendFactor sourceFactor, const BlendFactor destFactor) {
+    glBlendFunc(toGLFactor(sourceFactor), toGLFactor(destFactor));
+}
+
+void RenderSystem::setActiveTextureSlot(const uint32_t slot) {
+    assert(slot < 32 && "Texture slot index exceeds maximum allowed texture units");
+    glActiveTexture(GL_TEXTURE0 + slot);
+}
+
+void RenderSystem::bindTexture(const TextureType type, const GLuint textureId) {
+    GLenum glTarget = GL_TEXTURE_2D;
+    switch (type) {
+        case TextureType::Texture2D:      glTarget = GL_TEXTURE_2D; break;
+        case TextureType::Texture2DArray: glTarget = GL_TEXTURE_2D_ARRAY; break;
+        case TextureType::TextureCubeMap: glTarget = GL_TEXTURE_CUBE_MAP; break;
+        case TextureType::Texture3D:      glTarget = GL_TEXTURE_3D; break;
+    }
+
+    glBindTexture(glTarget, textureId);
+}
+
+void RenderSystem::bindTexture(const uint32_t slot, const TextureType type, const GLuint textureId) {
+    setActiveTextureSlot(slot);
+    bindTexture(type, textureId);
+}
+
+void RenderSystem::bindTexture(const uint32_t slot, const GLuint textureId) {
+    bindTexture(slot, TextureType::Texture2D, textureId);
 }
 
 void RenderSystem::checkError(std::string_view context, const std::source_location location) {
@@ -83,11 +155,11 @@ void RenderSystem::enter3D() {
     setFaceCulling(true);
 
     // Restore whatever render mode the 3D world is currently using
-    setRenderMode(m_renderMode);
+    setRenderMode(s_renderMode);
 }
 
 void RenderSystem::setRenderMode(const RenderMode mode) {
-    m_renderMode = mode;
+    s_renderMode = mode;
 
     switch (mode) {
         case Fill:

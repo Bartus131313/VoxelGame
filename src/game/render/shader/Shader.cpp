@@ -5,6 +5,7 @@
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../RenderSystem.h"
 #include "../../../core/Logger.h"
 
 Shader::~Shader() {
@@ -124,9 +125,8 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
     glUniformMatrix4fv(glGetUniformLocation(m_programID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::setTexture(const std::string& name, const GLuint textureID, const unsigned int slot, const GLenum target) const {
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(target, textureID);
+void Shader::setTexture(const std::string& name, const GLuint textureId, const uint32_t slot, const TextureType type) const {
+    RenderSystem::bindTexture(slot, type, textureId);
     setInt(name, static_cast<int>(slot));
 }
 

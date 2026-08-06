@@ -88,7 +88,7 @@ void SkyRenderer::update(const std::int64_t ticks) {
 
 void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) const {
     // Setup state for sky rendering
-    RenderSystem::setDepthFunc(GL_LEQUAL);
+    RenderSystem::setDepthFunc(DepthFunc::LessOrEqual);
     RenderSystem::setFaceCulling(false);
 
     // Make the sky to always render with Fill mode
@@ -105,7 +105,7 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
 
     // Setup state for celestial bodies
     RenderSystem::setBlending(true);
-    RenderSystem::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    RenderSystem::setBlendFunc(BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha);
 
     // Sun: full-size atlas (no phases), full brightness, only really visible while above horizon
     const float sunBrightness = glm::clamp(sunDir.y * 4.0f + 0.2f, 0.0f, 1.0f);
@@ -131,7 +131,7 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
 
     // Restore default 3D pipeline states
     RenderSystem::setBlending(false);
-    RenderSystem::setDepthFunc(GL_LESS);
+    RenderSystem::setDepthFunc(DepthFunc::Less);
     RenderSystem::setFaceCulling(true);
 
     // Restore render mode
@@ -189,7 +189,7 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     m_celestialShader->setFloat("brightness", brightness);
     m_celestialShader->setVec2("uvMin", uvMin);
     m_celestialShader->setVec2("uvMax", uvMax);
-    m_celestialShader->setTexture("bodyTexture", texture->id, 0, GL_TEXTURE_2D);
+    m_celestialShader->setTexture("bodyTexture", texture->id, 0, TextureType::Texture2D);
 
     glBindVertexArray(m_celestialVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

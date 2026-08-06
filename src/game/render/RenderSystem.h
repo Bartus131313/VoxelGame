@@ -24,6 +24,54 @@ struct std::formatter<RenderMode> : std::formatter<std::string_view> {
     }
 };
 
+/** @brief Face culling targets. */
+enum class CullFace : uint8_t {
+    Front, Back, FrontAndBack
+};
+
+/** @brief Triangle vertex winding orders. */
+enum class WindingOrder : uint8_t {
+    Clockwise, CounterClockwise
+};
+
+/** @brief Depth buffer comparison algorithms. */
+enum class DepthFunc : uint8_t {
+    Never,
+    Less,
+    Equal,
+    LessOrEqual,
+    Greater,
+    NotEqual,
+    GreaterOrEqual,
+    Always
+};
+
+/** @brief Source and destination alpha blending calculation factors. */
+enum class BlendFactor : uint8_t {
+    Zero,
+    One,
+    SrcColor,
+    OneMinusSrcColor,
+    DstColor,
+    OneMinusDstColor,
+    SrcAlpha,
+    OneMinusSrcAlpha,
+    DstAlpha,
+    OneMinusDstAlpha,
+    ConstantColor,
+    OneMinusConstantColor,
+    ConstantAlpha,
+    OneMinusConstantAlpha
+};
+
+/** @brief Target texture bind targets. */
+enum class TextureType : uint8_t {
+    Texture2D,
+    Texture2DArray,
+    TextureCubeMap,
+    Texture3D
+};
+
 /**
  * @brief Global OpenGL state manager and rendering pipeline coordinator.
  *
@@ -63,11 +111,18 @@ public:
     static void setViewport(int width, int height);
 
     /**
-     * @brief Sets the depth comparison function.
+     * @brief Enables of disables depth test.
      *
-     * @param func Depth function (e.g., GL_LESS, GL_LEQUAL).
+     * @param enable @c true to enable depth test, @c false to disable.
      */
-    static void setDepthFunc(GLenum func);
+    static void setDepthTest(bool enable);
+
+    /**
+     * @brief Sets the depth buffer comparison operation.
+     *
+     * @param func Comparison algorithm used to pass or fail incoming depth pixels.
+     */
+    static void setDepthFunc(DepthFunc func);
 
     /**
      * @brief Enables or disables face culling.
@@ -77,6 +132,20 @@ public:
     static void setFaceCulling(bool enable);
 
     /**
+    * @brief Sets which polygon face is culled (Front, Back, or FrontAndBack).
+    *
+    * @param face Target polygon face (Front, Back, or FrontAndBack) to discard during rasterization.
+    */
+    static void setCullFace(CullFace face);
+
+    /**
+    * @brief Sets the winding order that determines front-facing polygons (CCW is OpenGL default).
+    *
+    * @param order Vertex winding direction (Clockwise or CounterClockwise) used to identify front-facing polygons.
+    */
+    static void setWindingOrder(WindingOrder order);
+
+    /**
      * @brief Enables or disables alpha blending.
      *
      * @param enable @c true to enable blending, @c false to disable.
@@ -84,19 +153,44 @@ public:
     static void setBlending(bool enable);
 
     /**
-     * @brief Enables of disables depth test.
+     * @brief Sets the pixel blending arithmetic factors for source and destination colors.
      *
-     * @param enable @c true to enable depth test, @c false to disable.
+     * @param sourceFactor Specifies how the incoming RGBA color factor is calculated.
+     * @param destFactor Specifies how the existing frame buffer color factor is calculated.
      */
-    static void setDepthTest(bool enable);
+    static void setBlendFunc(BlendFactor sourceFactor, BlendFactor destFactor);
 
     /**
-     * @brief Sets the alpha blending function factors.
+     * @brief Sets the active GL texture unit slot.
      *
-     * @param sourceFactor Source blending factor (e.g., GL_SRC_ALPHA).
-     * @param destFactor Destination blending factor (e.g., GL_ONE_MINUS_SRC_ALPHA).
+     * @param slot Texture unit index (0 for slot 0 / GL_TEXTURE0, 1 for slot 1, etc.).
      */
-    static void setBlendFunc(GLenum sourceFactor, GLenum destFactor);
+    static void setActiveTextureSlot(uint32_t slot);
+
+    /**
+     * @brief Binds a texture object to the currently active texture unit slot.
+     *
+     * @param type Target texture type.
+     * @param textureId Native graphics driver texture handle ID.
+     */
+    static void bindTexture(TextureType type, GLuint textureId);
+
+    /**
+     * @brief Convenience function that sets the active slot and binds a texture in one call.
+     *
+     * @param slot Texture unit index.
+     * @param type Target texture type.
+     * @param textureId Native graphics driver texture handle ID.
+     */
+    static void bindTexture(uint32_t slot, TextureType type, GLuint textureId);
+
+    /**
+     * @brief Convenience overload for 2D textures on a specific slot.
+     *
+     * @param slot Texture unit index.
+     * @param textureId Native graphics driver texture handle ID.
+     */
+    static void bindTexture(uint32_t slot, GLuint textureId);
 
     /**
      * @brief Checks and logs any pending OpenGL errors.
@@ -131,8 +225,8 @@ public:
      *
      * @return Current render mode.
      */
-    static RenderMode getRenderMode() { return m_renderMode; }
+    static RenderMode getRenderMode() { return s_renderMode; }
 
 private:
-    static RenderMode m_renderMode;
+    static RenderMode s_renderMode;
 };

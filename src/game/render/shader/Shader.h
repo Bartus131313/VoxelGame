@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include "../RenderSystem.h"
+
 /** @brief Represents type of shader compilation used for error check. */
 enum ShaderCompilationType {
     Vertex, Fragment, Geometry, Program, Compute
@@ -110,11 +112,12 @@ public:
      * @brief Binds a texture handle to an OpenGL texture slot and updates the sampler uniform in the shader.
      *
      * @param name Name of sampler uniform in shader (e.g., "u_Texture").
-     * @param textureID OpenGL texture handle to bind.
+     * @param textureId OpenGL texture handle to bind.
      * @param slot Texture unit index (0 for GL_TEXTURE0, 1 for GL_TEXTURE1, etc.).
-     * @param target Texture target type (defaults to GL_TEXTURE_2D, can also be GL_TEXTURE_CUBE_MAP, etc.).
+     * @param type Texture target type (defaults to Texture2D, can also be TextureCubeMap, etc.).
      */
-    void setTexture(const std::string& name, GLuint textureID, unsigned int slot = 0, GLenum target = GL_TEXTURE_2D) const;
+    void setTexture(const std::string& name, GLuint textureId, uint32_t slot,
+        TextureType type = TextureType::Texture2D) const;
 
 private:
     GLuint m_programID = 0; ///< OpenGL shader program ID.

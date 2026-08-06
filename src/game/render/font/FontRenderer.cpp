@@ -12,15 +12,14 @@ void FontRenderer::renderText(const Shader* shader, const FontData* fontData, co
 
     // Enable Blending for font transparency
     RenderSystem::setBlending(true);
-    RenderSystem::setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    RenderSystem::setBlendFunc(BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha);
 
     // Bind Shader and Set Uniforms
     shader->setVec4("textColor", color);
     shader->setInt("textTexture", 0);
 
     // Bind Font Texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fontData->textureID);
+    RenderSystem::bindTexture(0, TextureType::Texture2D, fontData->textureID);
 
     // Setup initial layout coordinates with top-left anchor shift
     auto currX = static_cast<float>(x);

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../RenderSystem.h"
 #include "../Vertex.h"
 #include "../../../core/Logger.h"
 
@@ -64,7 +65,7 @@ std::shared_ptr<FontData> FontManager::loadFont(const ResourceLocation& fontLoca
 
     // Create OpenGL texture
     glGenTextures(1, &fontData->textureID);
-    glBindTexture(GL_TEXTURE_2D, fontData->textureID);
+    RenderSystem::bindTexture(TextureType::Texture2D, fontData->textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, FONT_ATLAS_WIDTH, FONT_ATLAS_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

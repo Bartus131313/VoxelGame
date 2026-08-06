@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "../RenderSystem.h"
 #include "../../../core/Logger.h"
 
 std::unordered_map<TextureKey, std::shared_ptr<TextureData>> TextureManager::m_textures;
@@ -53,7 +54,7 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const ResourceLocation&
 
     // Create and configure OpenGL texture
     glGenTextures(1, &textureData->id);
-    glBindTexture(GL_TEXTURE_2D, textureData->id);
+    RenderSystem::bindTexture(TextureType::Texture2D, textureData->id);
 
     glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(internalFormat), width, height, 0, dataFormat, GL_UNSIGNED_BYTE, pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -64,7 +65,7 @@ std::shared_ptr<TextureData> TextureManager::loadTexture(const ResourceLocation&
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    RenderSystem::bindTexture(TextureType::Texture2D, 0);
 
     // Free CPU image data buffer
     stbi_image_free(pixels);
