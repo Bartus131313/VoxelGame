@@ -40,7 +40,7 @@ public:
         const int32_t chunkX = blockToChunk(x);
         const int32_t chunkZ = blockToChunk(z);
 
-        const ChunkData* chunk = getChunk(chunkX, chunkZ);
+        const ChunkData* chunk = getChunkAt(chunkX, chunkZ);
         if (!chunk) return BlockState{};
 
         const auto localX = posToLocal(x);
@@ -64,9 +64,41 @@ public:
         if (!chunk) return;
 
         const auto localX = posToLocal(x);
+        const auto localY = posToLocal(y);
         const auto localZ = posToLocal(z);
 
         chunk->setBlockState(localX, static_cast<uint16_t>(y), localZ, state);
+
+        const auto subChunkY = y / WorldConfig::SUBCHUNK_SIZE;
+
+        // Check X boundaries and mark neighbor chunks dirty
+        if (localX == 0) {
+            if (ChunkData* neighbor = getChunkAt(blockToChunk(x - 1), chunkZ)) {
+                neighbor->markSubChunkDirty(subChunkY);
+            }
+        } else if (localX == WorldConfig::SUBCHUNK_SIZE - 1) {
+            if (ChunkData* neighbor = getChunkAt(blockToChunk(x + 1), chunkZ)) {
+                neighbor->markSubChunkDirty(subChunkY);
+            }
+        }
+
+        // Check Z boundaries and mark neighbor chunks dirty
+        if (localZ == 0) {
+            if (ChunkData* neighbor = getChunkAt(chunkX, blockToChunk(z - 1))) {
+                neighbor->markSubChunkDirty(subChunkY);
+            }
+        } else if (localZ == WorldConfig::SUBCHUNK_SIZE - 1) {
+            if (ChunkData* neighbor = getChunkAt(chunkX, blockToChunk(z + 1))) {
+                neighbor->markSubChunkDirty(subChunkY);
+            }
+        }
+
+        // Check Y boundaries and mark subchunks dirty within the SAME chunk column
+        if (localY == 0 && subChunkY > 0) {
+            chunk->markSubChunkDirty(subChunkY - 1);
+        } else if (localY == WorldConfig::SUBCHUNK_SIZE - 1 && subChunkY < WorldConfig::CHUNK_HEIGHT - 1) {
+            chunk->markSubChunkDirty(subChunkY + 1);
+        }
     }
 
     /** @brief Retrieves a loaded region by region world coordinates. Returns nullptr if not loaded. */
@@ -87,11 +119,11 @@ public:
     }
 
     /** @brief Retrieves a loaded chunk by chunk world coordinates. Returns nullptr if not loaded. */
-    [[nodiscard]] ChunkData* getChunk(const int32_t chunkX, const int32_t chunkZ) {
+    [[nodiscard]] ChunkData* getChunkAt(const int32_t chunkX, const int32_t chunkZ) {
         const int32_t rx = chunkToRegion(chunkX);
         const int32_t rz = chunkToRegion(chunkZ);
 
-        RegionData* region = getRegion(rx, rz);
+        const RegionData* region = getRegion(rx, rz);
         if (!region) return nullptr;
 
         return region->getChunk(chunkX, chunkZ);

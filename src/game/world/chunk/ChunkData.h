@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <bitset>
 #include <memory>
 
 #include "SubChunkData.h"
@@ -85,7 +86,7 @@ public:
         }
 
         m_subChunks[subChunkY]->setBlockState(x, localY, z, state);
-        m_isDirty = true; // Mark chunk for mesh rebuild
+        markSubChunkDirty(subChunkY);
     }
 
     /**
@@ -95,7 +96,7 @@ public:
      *
      * @return Raw pointer to subchunk or @c nullptr if unallocated.
      */
-    [[nodiscard]] const SubChunkData* getSubChunk(const uint8_t subChunkY) const {
+    [[nodiscard]] const SubChunkData* getSubChunk(const uint8_t subChunkY) {
         if (subChunkY >= m_subChunks.size()) return nullptr;
         return m_subChunks[subChunkY].get();
     }
@@ -109,19 +110,57 @@ public:
     /** @brief Returns chunk Z position in world space. */
     [[nodiscard]] int32_t getChunkPosZ() const { return m_chunkPos.z; }
 
-    /**
-     * @brief Checks if chunk is dirty.
-     *
-     * @return @c true if this chunk's mesh need to be rebuilt, @c false if not.
-     */
-    [[nodiscard]] bool isDirty() const { return m_isDirty; }
+    /** @brief Makes the whole chunk dirty, meaning whole chunk mesh needs to be rebuilt. */
+    void markDirty() noexcept {
+        m_dirtyBitmask.set();
+    }
 
-    /** @brief Makes the chunk non-dirty, meaning there is no need to rebuild the mesh. */
-    void clearDirty() { m_isDirty = false; }
+    /**
+     * @brief Makes specific subchunk dirty, meaning its mesh needs to be rebuilt.
+     *
+     * @param subChunkY Vertical position of subchunk.
+     */
+    void markSubChunkDirty(const uint8_t subChunkY) noexcept {
+        m_dirtyBitmask.set(subChunkY);
+    }
+
+    /**
+     * @brief Checks if specific subchunk is dirty.
+     *
+     * @param subChunkY Vertical position of subchunk.
+     *
+     * @return @c true if subchunk is dirty, @c false if not.
+     */
+    [[nodiscard]] bool isSubChunkDirty(const uint8_t subChunkY) const noexcept {
+        return m_dirtyBitmask.test(subChunkY);
+    }
+
+    /**
+     * @brief Checks if any subchunk is dirty.
+     *
+     * @return @c true if any subchunk is dirty, @c false if not.
+     */
+    [[nodiscard]] bool isAnySubChunkDirty() const noexcept {
+        return m_dirtyBitmask.any();
+    }
+
+    /** @brief Makes the whole chunk non-dirty, meaning there is no need to rebuild whole chunk mesh. */
+    void clearDirty() noexcept { m_dirtyBitmask.reset(); }
+
+    /**
+     * @brief Makes specific subchunk non-dirty, meaning there is no need to rebuild its mesh.
+     *
+     * @param subChunkY Vertical position of subchunk.
+     */
+    void clearSubChunkDirty(const uint8_t subChunkY) noexcept {
+        m_dirtyBitmask.reset(subChunkY);
+    }
 
 private:
-    ChunkPos m_chunkPos;    ///< World chunk position.
-    bool m_isDirty{true};   ///< Flag indicating whether GPU mesh needs rebuilding.
+    ChunkPos m_chunkPos;    ///< Chunk position in world space.
+
+    /// Flag for each subchunk indicating whether its GPU mesh needs rebuilding.
+    std::bitset<WorldConfig::CHUNK_HEIGHT> m_dirtyBitmask{0xFFFF};
 
     /// Array storing all vertical subchunks.
     std::array<std::unique_ptr<SubChunkData>, WorldConfig::CHUNK_HEIGHT> m_subChunks{};
