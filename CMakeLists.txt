@@ -62,16 +62,16 @@ add_executable(${PROJECT_NAME}
         src/core/Logger.cpp
         src/core/Logger.h
         src/game/resource/ResourceLocation.h
-        src/game/world/chunk/SubChunkData.h
-        src/game/world/block/BlockState.h
-        src/game/world/chunk/ChunkData.h
-        src/game/world/chunk/RegionData.h
-        src/game/world/WorldConfig.h
-        src/game/world/WorldData.cpp
-        src/game/world/WorldData.h
+        src/game/voxel/chunk/SubChunkData.h
+        src/game/voxel/block/BlockState.h
+        src/game/voxel/chunk/ChunkData.h
+        src/game/voxel/chunk/RegionData.h
+        src/game/voxel/WorldConfig.h
+        src/game/voxel/WorldData.cpp
+        src/game/voxel/WorldData.h
         src/game/render/world/WorldRenderer.cpp
         src/game/render/world/WorldRenderer.h
-        src/game/world/Direction.h
+        src/game/voxel/Direction.h
         src/game/render/texture/TextureAtlasManager.cpp
         src/game/render/texture/TextureAtlasManager.h
 )

@@ -45,27 +45,35 @@ struct TextureAtlas {
     std::unordered_map<std::string, AnimatedTexture> animMap;
 };
 
+/** @brief A single rectangle placement result from the shelf packer. */
+struct PackedRect {
+    std::string key;
+    int x, y;
+    int width, height;
+    bool isAnimated;
+};
+
 class TextureAtlasManager {
 public:
-    /** @brief Loads all atlases from game's @c textures/ folder. */
+    /** @brief Loads all atlases from game's @c textures/ folder (uses on-disk cache when valid). */
     static void init();
 
     /**
      * @brief Updates all animated textures in all atlases.
-     *
      * @param deltaTime Time elapsed since last frame.
      */
     static void update(float deltaTime);
 
-    /** @brief Dumps a packed atlas texture to disk as a PNG for debugging. */
+    /** @brief Dumps a single packed atlas texture to disk as a PNG for debugging. */
     static void saveAtlasFile(const std::string& atlasName, const std::string& outputPath);
+
+    /** @brief Dumps every loaded atlas to @p outputDir as "<atlasName>.png". */
+    static void saveAllAtlases(const std::string& outputDir);
 
     /**
      * @brief Gets UV box for specific texture in specific atlas.
-     *
      * @param atlasName Name of the atlas.
      * @param textureName Name of the texture.
-     *
      * @return UV box of the texture.
      */
     static UVBox getUVBox(const std::string& atlasName, const std::string& textureName);
@@ -76,21 +84,15 @@ public:
     /** @brief Frees all resources (texture atlases) loaded by this manager. */
     static void cleanup();
 
+    /** @brief If true, deletes and rebuilds the on-disk cache regardless of hash match. */
+    static bool forceRebuildCache;
+
 private:
     static const ResourceLocation texturesLocation;
 
-    /**
-     * @brief Calculates proper UV box (0.0 to 1.0) based on raw pixel box.
-     *
-     * @param x X position of the box top-left corner.
-     * @param y Y position of the box top-left corner.
-     * @param width Width of the box.
-     * @param height Height of the box.
-     * @param atlasWidth Width of the atlas.
-     * @param atlasHeight Height of the atlas.
-     *
-     * @return @c UVBox containing normalized uvs.
-     */
+    /// Stores unique string keys pointing to their texture atlases.
+    static std::unordered_map<std::string, TextureAtlas> s_atlasMap;
+
     [[nodiscard]] static UVBox calculateUVs(const int x, const int y, const int width, const int height,
         const int atlasWidth, const int atlasHeight) {
         return {
@@ -101,6 +103,6 @@ private:
         };
     }
 
-    /// Stores unique string keys pointing to their texture atlases.
-    static std::unordered_map<std::string, TextureAtlas> s_atlasMap;
+    /** @brief Resolves the cache directory (created if missing). */
+    static std::string getCacheDir();
 };

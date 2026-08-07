@@ -1,5 +1,5 @@
 #pragma once
-#include "../../world/WorldData.h"
+#include "../../voxel/WorldData.h"
 #include "../sky/SkyRenderer.h"
 
 class WorldRenderer {

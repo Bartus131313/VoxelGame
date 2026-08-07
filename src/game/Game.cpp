@@ -95,12 +95,10 @@ void Game::onWindowResize(const int width, const int height) {
 int Game::run() {
     // Initialize TextureAtlasManager for textures access
     TextureAtlasManager::init();
+    // TextureAtlasManager::saveAllAtlases("debug_atlases");
 
+    // Initialize world renderer
     m_worldRenderer.init();
-
-    // TextureAtlasManager::saveAtlasFile("core", "debug/atlas_core.png");
-    // TextureAtlasManager::saveAtlasFile("block", "debug/atlas_block.png");
-    // TextureAtlasManager::saveAtlasFile("environment", "debug/atlas_environment.png");
 
     // Set last update and render time to current time
     double currentTime = glfwGetTime();
@@ -173,7 +171,6 @@ void Game::cleanup() {
     // Free resources from all managers
     FontManager::cleanup();
     ShaderManager::cleanup();
-    // TextureManager::cleanup();
     TextureAtlasManager::cleanup();
 
     LOG_INFO("Shutting down application...");

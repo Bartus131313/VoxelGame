@@ -4,7 +4,7 @@
 #include "render/world/WorldRenderer.h"
 #include "ui/Canvas.h"
 #include "ui/elements/UILabel.h"
-#include "world/WorldData.h"
+#include "voxel/WorldData.h"
 
 /**
  * @brief Main application controller that manages the window lifecycle,
