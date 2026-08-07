@@ -25,6 +25,7 @@ public:
     static constexpr int  MAX_RENDER_DISTANCE   = 32;    /// Max amount of chunks in any direction that can be rendered.
 
     static constexpr float TICKS_PER_SECOND = 20.0f;    ///< How many ticks are in 1 second?
+    static constexpr float SECONDS_PER_TICK = 1.0f / TICKS_PER_SECOND;
 
     // -----
 

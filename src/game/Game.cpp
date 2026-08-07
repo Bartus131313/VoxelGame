@@ -6,13 +6,22 @@
 #include "../input/Input.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "render/RenderSystem.h"
-#include "render/texture/TextureManager.h"
+#include "render/texture/TextureAtlasManager.h"
 
 Game::Game()
     : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
 {
     // Register this game as listener for all window events
     m_window.addEventListener(this);
+
+    // Initialize Input System
+    Input::init(m_window.getNativeHandle());
+
+    // Register Action Mappings
+    setupInputBindings();
+
+    // Lock cursor by default for FPS camera tracking
+    Input::getMouse().setCursorLocked(true);
 
     // Initialize global state manager
     RenderSystem::init();
@@ -46,6 +55,9 @@ void Game::update(const float deltaTime) {
         const RenderMode currentMode = RenderSystem::getRenderMode();
         RenderSystem::setRenderMode(currentMode == Fill ? Line : Fill);
     }
+
+    // Update texture atlas manager
+    TextureAtlasManager::update(deltaTime);
 
     // Update world
     m_worldData.update(deltaTime);
@@ -81,14 +93,14 @@ void Game::onWindowResize(const int width, const int height) {
 }
 
 int Game::run() {
-    // Initialize Input System
-    Input::init(m_window.getNativeHandle());
+    // Initialize TextureAtlasManager for textures access
+    TextureAtlasManager::init();
 
-    // Register Action Mappings
-    setupInputBindings();
+    m_worldRenderer.init();
 
-    // Lock cursor by default for FPS camera tracking
-    Input::getMouse().setCursorLocked(true);
+    // TextureAtlasManager::saveAtlasFile("core", "debug/atlas_core.png");
+    // TextureAtlasManager::saveAtlasFile("block", "debug/atlas_block.png");
+    // TextureAtlasManager::saveAtlasFile("environment", "debug/atlas_environment.png");
 
     // Set last update and render time to current time
     double currentTime = glfwGetTime();
@@ -161,7 +173,8 @@ void Game::cleanup() {
     // Free resources from all managers
     FontManager::cleanup();
     ShaderManager::cleanup();
-    TextureManager::cleanup();
+    // TextureManager::cleanup();
+    TextureAtlasManager::cleanup();
 
     LOG_INFO("Shutting down application...");
 }

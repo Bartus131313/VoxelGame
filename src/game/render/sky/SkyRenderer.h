@@ -6,8 +6,8 @@
 
 #include "../../resource/ResourceLocation.h"
 #include "../mesh/impl/SkyboxMesh.h"
-#include "../texture/TextureManager.h"
 #include "../shader/ShaderManager.h"
+#include "../texture/TextureAtlasManager.h"
 
 /**
  * @brief Renders a fully procedural sky with  a gradient dome plus
@@ -71,23 +71,25 @@ private:
      * @param projection Projection matrix.
      * @param direction Direction which the body will be facing in.
      * @param angle Angle of the body.
-     * @param texture Texture of the body (sun or moon).
-     * @param uvMin Minimal UV coords of the texture.
-     * @param uvMax Maximal UV coords of the texture.
+     * @param atlasTextureID ID of atlas OpenGL texture for celestial body.
+     * @param uvBox UV box of the texture.
      * @param size Size of the body.
      * @param brightness Brightness of the texture (alpha).
      */
     void renderCelestialBody(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& direction,
-                             float angle, const std::shared_ptr<TextureData>& texture, glm::vec2 uvMin,
-                             glm::vec2 uvMax, float size, float brightness) const;
+                             float angle, GLuint atlasTextureID, const UVBox& uvBox, float size, float brightness) const;
 
     SkyboxMesh m_domeMesh{}; ///< Reused unit cube, sampled as a direction vector for the gradient dome.
 
     std::shared_ptr<Shader> m_domeShader = nullptr;         ///< Procedural gradient sky shader.
     std::shared_ptr<Shader> m_celestialShader = nullptr;    ///< Billboard quad shader for sun/moon.
 
-    std::shared_ptr<TextureData> m_sunTexture = nullptr;    ///< Sun texture used by celestial body.
-    std::shared_ptr<TextureData> m_moonAtlas = nullptr;     ///< All moon phases used by celestial body.
+    GLuint m_environmentAtlasID = 0;
+    UVBox m_sunUVBox{};
+    UVBox m_moonPhaseUVBoxes[8];
+
+    // std::shared_ptr<TextureData> m_sunTexture = nullptr;    ///< Sun texture used by celestial body.
+    // std::shared_ptr<TextureData> m_moonAtlas = nullptr;     ///< All moon phases used by celestial body.
 
     GLuint m_celestialVAO = 0, m_celestialVBO = 0;          ///< Unit quad in local space, built once.
 

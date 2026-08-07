@@ -9,6 +9,7 @@
 #include "../../Game.h"
 #include "../../../core/Logger.h"
 #include "../shader/ShaderManager.h"
+#include "../texture/TextureAtlasManager.h"
 
 namespace {
     /// Unit quad, centered at origin, in local billboard space [-0.5, 0.5]
@@ -39,9 +40,14 @@ void SkyRenderer::init(const ResourceLocation& sunResource, const ResourceLocati
     m_domeShader = ShaderManager::loadShader(skyDomeShaderLocation);
     m_celestialShader = ShaderManager::loadShader(celestialShaderLocation);
 
-    // Then load all textures
-    m_sunTexture = TextureManager::loadTexture(sunResource, false);
-    m_moonAtlas = TextureManager::loadTexture(moonAtlasResource, false);
+    // Fetch the "environment" atlas ID and lookup UV coordinates for sun and moon phases
+    m_environmentAtlasID = TextureAtlasManager::getAtlasTextureID("environment");
+    m_sunUVBox = TextureAtlasManager::getUVBox("environment", "celestial/sun");
+
+    for (int i = 0; i < 8; ++i) {
+        std::string phaseKey = "celestial/moon/phase_" + std::to_string(i);
+        m_moonPhaseUVBoxes[i] = TextureAtlasManager::getUVBox("environment", phaseKey);
+    }
 
     // Generate VAO and VBO
     glGenVertexArrays(1, &m_celestialVAO);
@@ -110,8 +116,8 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
     // Sun: full-size atlas (no phases), full brightness, only really visible while above horizon
     const float sunBrightness = glm::clamp(sunDir.y * 4.0f + 0.2f, 0.0f, 1.0f);
     if (sunBrightness > 0.0f) {
-        renderCelestialBody(view, projection, sunDir, sunAngle, m_sunTexture, glm::vec2(0.0f), glm::vec2(1.0f),
-                             60.0f, sunBrightness);
+        renderCelestialBody(view, projection, sunDir, sunAngle, m_environmentAtlasID,
+            m_sunUVBox, 60.0f, sunBrightness);
     }
 
     // Moon: pick the UV rect for the current phase out of a 4x2 atlas
@@ -126,7 +132,8 @@ void SkyRenderer::render(const glm::mat4& view, const glm::mat4& projection) con
 
     const float moonBrightness = glm::clamp(moonDir.y * 4.0f + 0.2f, 0.0f, 1.0f) * 0.6f;
     if (moonBrightness > 0.0f) {
-        renderCelestialBody(view, projection, moonDir, moonAngle, m_moonAtlas, moonUvMin, moonUvMax, 48.0f, moonBrightness);
+        renderCelestialBody(view, projection, moonDir, moonAngle, m_environmentAtlasID,
+            m_moonPhaseUVBoxes[m_moonPhase], 48.0f, moonBrightness);
     }
 
     // Restore default 3D pipeline states
@@ -159,15 +166,14 @@ void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projecti
 }
 
 void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& direction,
-                                       const float angle, const std::shared_ptr<TextureData>& texture,
-                                       const glm::vec2 uvMin, const glm::vec2 uvMax, const float size,
-                                       const float brightness) const {
+                                       const float angle, const GLuint atlasTextureID, const UVBox& uvBox,
+                                       const float size, const float brightness) const {
     if (!m_celestialShader) {
         LOG_WARN("Rendering celestial body skipped - no celestial shader.");
         return;
     }
-    if (!texture || !texture->isValid()) {
-        LOG_WARN("Rendering celestial body skipped - texture missing/invalid.");
+    if (atlasTextureID == 0) {
+        LOG_WARN("Rendering celestial body skipped - environment atlas missing.");
         return;
     }
 
@@ -187,9 +193,13 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     m_celestialShader->setVec3("up", up);
     m_celestialShader->setFloat("size", size);
     m_celestialShader->setFloat("brightness", brightness);
-    m_celestialShader->setVec2("uvMin", uvMin);
-    m_celestialShader->setVec2("uvMax", uvMax);
-    m_celestialShader->setTexture("bodyTexture", texture->id, 0, TextureType::Texture2D);
+
+    // Pass the atlas UV bounds to the shader
+    m_celestialShader->setVec2("uvMin", glm::vec2(uvBox.uMin, uvBox.vMin));
+    m_celestialShader->setVec2("uvMax", glm::vec2(uvBox.uMax, uvBox.vMax));
+
+    // Bind the master environment atlas sheet instead of an individual texture
+    m_celestialShader->setTexture("bodyTexture", atlasTextureID, 0, TextureType::Texture2D);
 
     glBindVertexArray(m_celestialVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

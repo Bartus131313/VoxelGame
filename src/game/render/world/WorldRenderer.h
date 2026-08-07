@@ -15,6 +15,8 @@ public:
     WorldRenderer(WorldRenderer&&) noexcept = default;
     WorldRenderer& operator=(WorldRenderer&&) noexcept = default;
 
+    void init();
+
     /**
      * @brief Updates all essential renderers inside this one.
      *

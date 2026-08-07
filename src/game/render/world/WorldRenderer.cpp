@@ -5,12 +5,16 @@
 #include "../RenderSystem.h"
 
 WorldRenderer::WorldRenderer() {
-    // Initialize sky renderer
-    m_skyRenderer.init(sunTextureLocation, moonAtlasLocation);
+
 }
 
 WorldRenderer::~WorldRenderer() {
     // Nothing need to be cleaned up here now
+}
+
+void WorldRenderer::init() {
+    // Initialize sky renderer
+    m_skyRenderer.init(sunTextureLocation, moonAtlasLocation);
 }
 
 void WorldRenderer::update(const WorldData& worldData, const float deltaTime) {

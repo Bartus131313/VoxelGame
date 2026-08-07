@@ -53,8 +53,6 @@ add_executable(${PROJECT_NAME}
         src/game/render/mesh/impl/StaticMesh.h
         src/game/render/mesh/impl/SkyboxMesh.cpp
         src/game/render/mesh/impl/SkyboxMesh.h
-        src/game/render/texture/TextureManager.cpp
-        src/game/render/texture/TextureManager.h
         src/game/render/sky/SkyRenderer.cpp
         src/game/render/sky/SkyRenderer.h
         src/game/render/RenderSystem.cpp
@@ -74,6 +72,8 @@ add_executable(${PROJECT_NAME}
         src/game/render/world/WorldRenderer.cpp
         src/game/render/world/WorldRenderer.h
         src/game/world/Direction.h
+        src/game/render/texture/TextureAtlasManager.cpp
+        src/game/render/texture/TextureAtlasManager.h
 )
 
 # Include Directories for Headers
