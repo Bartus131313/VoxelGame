@@ -10,32 +10,32 @@ flat out float vSunsetStrength;
 flat out float vNightAmount;
 flat out vec2 vSunDirHorizNorm;
 
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 uProjection;
+uniform mat4 uView;
 
-uniform vec3 zenithDayColor;
-uniform vec3 horizonDayColor;
-uniform vec3 zenithNightColor;
-uniform vec3 horizonNightColor;
-uniform float daylightFactor;
-uniform vec3 sunDirection;
+uniform vec3 uZenithDayColor;
+uniform vec3 uHorizonDayColor;
+uniform vec3 uZenithNightColor;
+uniform vec3 uHorizonNightColor;
+uniform float uDaylightFactor;
+uniform vec3 uSunDirection;
 
 void main() {
     Direction = aPos;
 
-    vZenithColor = mix(zenithNightColor, zenithDayColor, daylightFactor);
-    vHorizonColor = mix(horizonNightColor, horizonDayColor, daylightFactor);
+    vZenithColor = mix(uZenithNightColor, uZenithDayColor, uDaylightFactor);
+    vHorizonColor = mix(uHorizonNightColor, uHorizonDayColor, uDaylightFactor);
 
-    float sunHeight = sunDirection.y;
+    float sunHeight = uSunDirection.y;
     vSunsetStrength = 1.0 - smoothstep(0.0, 0.35, abs(sunHeight));
-    vNightAmount = 1.0 - smoothstep(0.0, 0.35, daylightFactor);
+    vNightAmount = 1.0 - smoothstep(0.0, 0.35, uDaylightFactor);
 
-    vec2 sunHoriz = vec2(sunDirection.x, sunDirection.z);
+    vec2 sunHoriz = vec2(uSunDirection.x, uSunDirection.z);
     vSunDirHorizNorm = sunHoriz / max(length(sunHoriz), 0.0001);
 
     // Strip translation so the dome stays centered on the camera, same trick as a cubemap skybox
-    mat4 staticView = mat4(mat3(view));
-    vec4 pos = projection * staticView * vec4(aPos, 1.0);
+    mat4 staticView = mat4(mat3(uView));
+    vec4 pos = uProjection * staticView * vec4(aPos, 1.0);
 
     // Push to far plane
     gl_Position = pos.xyww;

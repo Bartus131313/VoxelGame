@@ -4,16 +4,16 @@ out vec4 FragColor;
 
 in vec2 TexCoord;
 
-uniform sampler2D bodyTexture;
-uniform vec2 uvMin; // Atlas rect min
-uniform vec2 uvMax; // Atlas rect max
-uniform float brightness;
+uniform sampler2D uTexture;
+uniform vec2 uUVMin;
+uniform vec2 uUVMax;
+uniform float uBrightness;
 
 void main() {
-    vec2 atlasUV = mix(uvMin, uvMax, TexCoord);
-    vec4 texColor = texture(bodyTexture, atlasUV);
+    vec2 atlasUV = mix(uUVMin, uUVMax, TexCoord);
+    vec4 texColor = texture(uTexture, atlasUV);
 
-    float alpha = texColor.a * brightness;
+    float alpha = texColor.a * uBrightness;
 
     if (alpha < 0.02) discard;
 

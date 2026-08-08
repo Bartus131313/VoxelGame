@@ -15,8 +15,8 @@ void FontRenderer::renderText(const Shader* shader, const FontData* fontData, co
     RenderSystem::setBlendFunc(BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha);
 
     // Bind Shader and Set Uniforms
-    shader->setVec4("textColor", color);
-    shader->setInt("textTexture", 0);
+    shader->setVec4("uColor", color);
+    shader->setInt("uTexture", 0);
 
     // Bind Font Texture
     RenderSystem::bindTexture(0, TextureType::Texture2D, fontData->textureID);

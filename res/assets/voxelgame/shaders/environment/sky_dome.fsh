@@ -10,7 +10,7 @@ flat in float vSunsetStrength;
 flat in float vNightAmount;
 flat in vec2 vSunDirHorizNorm;
 
-uniform float time; // Seconds elapsed, used to gently twinkle the stars
+uniform float uTime; // Seconds elapsed, used to gently twinkle the stars
 
 // Cheap hash-based pseudo-random value in [0, 1] for a 3D input
 float hash3(vec3 p) {
@@ -85,7 +85,7 @@ float stars(vec3 dir) {
                 contribution = max(core, spike * 0.85);
             }
 
-            float twinkle = 0.65 + 0.35 * sin(time * (1.5 + brightnessSeed * 2.5) + brightnessSeed * 6.2831);
+            float twinkle = 0.65 + 0.35 * sin(uTime * (1.5 + brightnessSeed * 2.5) + brightnessSeed * 6.2831);
             contribution *= (0.4 + 0.6 * brightnessSeed) * twinkle;
 
             star = max(star, contribution);

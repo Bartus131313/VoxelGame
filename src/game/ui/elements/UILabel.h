@@ -49,14 +49,14 @@ public:
 
         // Use font shader and set projection matrix
         m_shader->use();
-        m_shader->setMat4("projection", projectionMatrix);
+        m_shader->setMat4("uProjection", projectionMatrix);
 
         // Render text on screen
         FontRenderer::renderText(m_shader.get(), m_fontData.get(), m_text, m_position.x, m_position.y, m_scale, m_color);
     }
 
 private:
-    const ResourceLocation fontShaderLocation{"shaders/font"};
+    const ResourceLocation fontShaderLocation{"shaders/ui/blit_text"};
 
     std::shared_ptr<Shader> m_shader;       ///< Shader program used for rendering text.
     std::shared_ptr<FontData> m_fontData;   ///< Shared pointer to cached font atlas metadata used for rendering.

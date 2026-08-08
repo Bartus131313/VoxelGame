@@ -152,15 +152,15 @@ void SkyRenderer::renderSkyDome(const glm::mat4& view, const glm::mat4& projecti
     const glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, std::sin(sunAngle), -std::cos(sunAngle)));
 
     m_domeShader->use();
-    m_domeShader->setMat4("view", view);
-    m_domeShader->setMat4("projection", projection);
-    m_domeShader->setFloat("daylightFactor", m_daylightFactor);
-    m_domeShader->setVec3("sunDirection", sunDir);
-    m_domeShader->setFloat("time", m_elapsedSeconds);
-    m_domeShader->setVec3("zenithDayColor", glm::vec3(0.30f, 0.55f, 0.95f));
-    m_domeShader->setVec3("horizonDayColor", glm::vec3(0.70f, 0.82f, 0.95f));
-    m_domeShader->setVec3("zenithNightColor", glm::vec3(0.02f, 0.025f, 0.06f));
-    m_domeShader->setVec3("horizonNightColor", glm::vec3(0.05f, 0.055f, 0.10f));
+    m_domeShader->setMat4("uView", view);
+    m_domeShader->setMat4("uProjection", projection);
+    m_domeShader->setFloat("uDaylightFactor", m_daylightFactor);
+    m_domeShader->setVec3("uSunDirection", sunDir);
+    m_domeShader->setFloat("uTime", m_elapsedSeconds);
+    m_domeShader->setVec3("uZenithDayColor", glm::vec3(0.30f, 0.55f, 0.95f));
+    m_domeShader->setVec3("uHorizonDayColor", glm::vec3(0.70f, 0.82f, 0.95f));
+    m_domeShader->setVec3("uZenithNightColor", glm::vec3(0.02f, 0.025f, 0.06f));
+    m_domeShader->setVec3("uHorizonNightColor", glm::vec3(0.05f, 0.055f, 0.10f));
 
     m_domeMesh.render();
 }
@@ -186,20 +186,20 @@ void SkyRenderer::renderCelestialBody(const glm::mat4& view, const glm::mat4& pr
     const glm::vec3 up(0.0f, std::cos(angle), std::sin(angle));
 
     m_celestialShader->use();
-    m_celestialShader->setMat4("view", view);
-    m_celestialShader->setMat4("projection", projection);
-    m_celestialShader->setVec3("worldPosition", worldPos);
-    m_celestialShader->setVec3("right", right);
-    m_celestialShader->setVec3("up", up);
-    m_celestialShader->setFloat("size", size);
-    m_celestialShader->setFloat("brightness", brightness);
+    m_celestialShader->setMat4("uView", view);
+    m_celestialShader->setMat4("uProjection", projection);
+    m_celestialShader->setVec3("uWorldPosition", worldPos);
+    m_celestialShader->setVec3("uRightVector", right);
+    m_celestialShader->setVec3("uUpVector", up);
+    m_celestialShader->setFloat("uSize", size);
+    m_celestialShader->setFloat("uBrightness", brightness);
 
     // Pass the atlas UV bounds to the shader
-    m_celestialShader->setVec2("uvMin", glm::vec2(uvBox.uMin, uvBox.vMin));
-    m_celestialShader->setVec2("uvMax", glm::vec2(uvBox.uMax, uvBox.vMax));
+    m_celestialShader->setVec2("uUVMin", glm::vec2(uvBox.uMin, uvBox.vMin));
+    m_celestialShader->setVec2("uUVMax", glm::vec2(uvBox.uMax, uvBox.vMax));
 
     // Bind the master environment atlas sheet instead of an individual texture
-    m_celestialShader->setTexture("bodyTexture", atlasTextureID, 0, TextureType::Texture2D);
+    m_celestialShader->setTexture("uTexture", atlasTextureID, 0, TextureType::Texture2D);
 
     glBindVertexArray(m_celestialVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
