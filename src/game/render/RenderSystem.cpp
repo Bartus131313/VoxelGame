@@ -6,7 +6,10 @@
 
 RenderMode RenderSystem::s_renderMode{Fill};
 
-void RenderSystem::init() {
+int RenderSystem::s_windowWidth = 0;
+int RenderSystem::s_windowHeight = 0;
+
+void RenderSystem::init(const int windowWidth, const int windowHeight) {
     // Enable depth buffer testing for correct 3D spatial sorting
     setDepthTest(true);
     setDepthFunc(DepthFunc::Less);
@@ -20,7 +23,9 @@ void RenderSystem::init() {
     setBlending(true);
     setBlendFunc(BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha);
 
-    LOG_INFO("Initialized global OpenGL states.");
+    setViewport(windowWidth, windowHeight);
+
+    LOG_INFO("Initialized global OpenGL states. Framebuffer size: {}x{}", windowWidth, windowHeight);
 }
 
 void RenderSystem::clear(const glm::vec3& color) {
@@ -35,6 +40,9 @@ void RenderSystem::clear(const float r, const float g, const float b) {
 
 void RenderSystem::setViewport(const int width, const int height) {
     glViewport(0, 0, width, height);
+
+    s_windowWidth = width;
+    s_windowHeight = height;
 }
 
 void RenderSystem::setDepthTest(const bool enable) {

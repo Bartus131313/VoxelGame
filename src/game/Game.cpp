@@ -7,6 +7,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "render/RenderSystem.h"
 #include "render/texture/TextureAtlasManager.h"
+#include "render/texture/TextureRenderer.h"
 
 Game::Game()
     : m_window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE), m_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -24,7 +25,7 @@ Game::Game()
     Input::getMouse().setCursorLocked(true);
 
     // Initialize global state manager
-    RenderSystem::init();
+    RenderSystem::init(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 void Game::update(const float deltaTime) {
@@ -75,6 +76,10 @@ void Game::render() {
     if (m_fpsLabel) m_fpsLabel->setText("FPS: " + std::to_string(getFPS()));
     if (m_renderModeLabel) m_renderModeLabel->setText(std::format("Render mode: {}", RenderSystem::getRenderMode()));
 
+    // Only for testing: render water texture
+    TextureRenderer::renderTexture("block", "water_still", 10, 68, 100, 100,
+        glm::vec3(0.2f, 0.3f, 0.67f));
+
     // Render UI canvas
     m_canvas.render();
 }
@@ -95,7 +100,9 @@ void Game::onWindowResize(const int width, const int height) {
 int Game::run() {
     // Initialize TextureAtlasManager for textures access
     TextureAtlasManager::init();
-    // TextureAtlasManager::saveAllAtlases("debug_atlases");
+
+    // Initialize texture renderer
+    TextureRenderer::init();
 
     // Initialize world renderer
     m_worldRenderer.init();
@@ -172,6 +179,8 @@ void Game::cleanup() {
     FontManager::cleanup();
     ShaderManager::cleanup();
     TextureAtlasManager::cleanup();
+
+    TextureRenderer::cleanup();
 
     LOG_INFO("Shutting down application...");
 }

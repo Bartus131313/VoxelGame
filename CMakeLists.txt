@@ -74,6 +74,8 @@ add_executable(${PROJECT_NAME}
         src/game/voxel/Direction.h
         src/game/render/texture/TextureAtlasManager.cpp
         src/game/render/texture/TextureAtlasManager.h
+        src/game/render/texture/TextureRenderer.cpp
+        src/game/render/texture/TextureRenderer.h
 )
 
 # Include Directories for Headers

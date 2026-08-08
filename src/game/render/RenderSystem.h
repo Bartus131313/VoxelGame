@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "glm/ext/matrix_clip_space.hpp"
+
 /** @brief Represents polygon mode used by OpenGL. */
 enum RenderMode : uint8_t {
     Fill = 0, Line = 1, Point = 2
@@ -83,8 +85,11 @@ public:
      * @brief Configures initial global OpenGL pipeline states.
      *
      * @note Must be called after an active OpenGL context is created by the Window class.
+     *
+     * @param windowWidth Width of the framebuffer.
+     * @param windowHeight Height of the framebuffer.
      */
-    static void init();
+    static void init(int windowWidth, int windowHeight);
 
     /**
      * @brief Clears color and depth buffers for the current frame using vec3.
@@ -227,6 +232,14 @@ public:
      */
     static RenderMode getRenderMode() { return s_renderMode; }
 
+    /** @brief Returns orthographic projection for 2D rendering. */
+    static glm::mat4 getOrthoProjection() {
+        return glm::ortho(0.0f, static_cast<float>(s_windowWidth),
+            static_cast<float>(s_windowHeight), 0.0f, -1.0f, 1.0f);
+    }
+
 private:
     static RenderMode s_renderMode;
+
+    static int s_windowWidth, s_windowHeight;
 };
