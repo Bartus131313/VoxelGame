@@ -105,4 +105,6 @@ private:
 
     /** @brief Resolves the cache directory (created if missing). */
     static std::string getCacheDir();
+
+    static bool s_initialized;  ///< Is the manager already initialized?
 };

@@ -29,11 +29,14 @@ public:
     static void cleanup();
 
 private:
+    /// ResourceLocation pointing to shader file.
     static const ResourceLocation shaderLocation;
 
+    /// Shader used to blit texture on the screen.
     static std::shared_ptr<Shader> s_textureShader;
 
-    static GLuint s_quadVAO;
-    static GLuint s_quadVBO;
-    static bool s_initialized;
+    static GLuint s_quadVAO;    ///< Vertex Array Object (VAO) of quad.
+    static GLuint s_quadVBO;    ///< Vertex Buffer Object (VBO) of quad.
+
+    static bool s_initialized;  ///< Is render already initialized?
 };

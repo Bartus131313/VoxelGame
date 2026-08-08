@@ -9,7 +9,12 @@
 LogLevel Logger::m_minLevel = LogLevel::Trace;
 std::mutex Logger::m_mutex;
 
+bool Logger::s_initialized = false;
+
 void Logger::init() {
+    if (s_initialized) return;
+    s_initialized = true;
+
 #ifdef _WIN32
     // Enable VT100 ANSI escape processing mode in Windows terminal
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

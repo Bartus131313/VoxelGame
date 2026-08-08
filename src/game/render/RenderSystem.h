@@ -239,7 +239,11 @@ public:
     }
 
 private:
+    /// Current render mode used by OpenGL.
     static RenderMode s_renderMode;
 
+    /// Width and height of the framebuffer.
     static int s_windowWidth, s_windowHeight;
+
+    static bool s_initialized;  ///< Is this system already initialized?
 };

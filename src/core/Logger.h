@@ -61,6 +61,8 @@ private:
 
     static LogLevel m_minLevel; ///< Current minimum visible log level threshold.
     static std::mutex m_mutex;  ///< Mutex enforcing thread-safe console output.
+
+    static bool s_initialized;  ///< Is the logger already initialized?
 };
 
 // Global convenience logging macros with automatic source location injection

@@ -21,6 +21,8 @@ const ResourceLocation TextureAtlasManager::texturesLocation{"textures"};
 std::unordered_map<std::string, TextureAtlas> TextureAtlasManager::s_atlasMap{};
 bool TextureAtlasManager::forceRebuildCache = false;
 
+bool TextureAtlasManager::s_initialized{false};
+
 namespace {
 
 /** @brief Helper structure to hold texture data before packing. */
@@ -263,6 +265,9 @@ static GLuint uploadAtlasTexture(int width, int height, const std::vector<uint8_
 }
 
 void TextureAtlasManager::init() {
+    if (s_initialized) return;
+    s_initialized = true;
+
     std::string baseTexturesPath = texturesLocation.resolveAssetPath();
 
     if (!fs::exists(baseTexturesPath) || !fs::is_directory(baseTexturesPath)) {

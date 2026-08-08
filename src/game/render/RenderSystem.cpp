@@ -9,7 +9,12 @@ RenderMode RenderSystem::s_renderMode{Fill};
 int RenderSystem::s_windowWidth = 0;
 int RenderSystem::s_windowHeight = 0;
 
+bool RenderSystem::s_initialized{false};
+
 void RenderSystem::init(const int windowWidth, const int windowHeight) {
+    if (s_initialized) return;
+    s_initialized = true;
+
     // Enable depth buffer testing for correct 3D spatial sorting
     setDepthTest(true);
     setDepthFunc(DepthFunc::Less);
